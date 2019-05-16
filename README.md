@@ -28,7 +28,7 @@ class OnCatChoosedEvent
 )
 ```
 
-- Send the event:
+- Send the event in the ``CatListActivity`` context:
 
 ```kotlin
 catButton.setOnClickListener {
@@ -37,7 +37,7 @@ catButton.setOnClickListener {
 }
 ```
 
-- Receive events:
+- Receive events in the ``MainActivity`` context:
 
 ```kotlin
 startActivity(Intent(this, CatListActivity::class.java))
