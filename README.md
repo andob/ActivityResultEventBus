@@ -40,7 +40,7 @@ catButton.setOnClickListener {
 - Receive events:
 
 ```kotlin
-Intent(this, CatListActivity::class.java).startActivity(i)
+startActivity(Intent(this, CatListActivity::class.java))
 OnActivityResult<OnCatChoosedEvent> { event ->
     catLabel.text=event.cat.name
 }
