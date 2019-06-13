@@ -1,6 +1,7 @@
 package ro.andreidobrescu.activityresulteventbus
 
 import android.app.Activity
+import android.os.Handler
 import android.view.View
 import androidx.fragment.app.Fragment
 
@@ -14,13 +15,22 @@ object ActivityResultEventBus
 {
     private val data : MutableMap<Activity, MutableList<ActivityResultTypedEventListener<*>>> = mutableMapOf()
 
-    fun <EVENT : Any> post(event : EVENT)
+    fun <EVENT : Any> post(event : EVENT, delay : Long = 0L)
     {
         val eventClass=event::class.java
         for ((activity, eventListeners) in data)
         {
             eventListeners.find { it.eventClass==eventClass }
-                ?.let { (it.eventConsumer as (EVENT) -> (Unit)).invoke(event) }
+                ?.let { eventListener ->
+                    val eventConsumer=eventListener.eventConsumer as (EVENT) -> (Unit)
+                    activity.runOnUiThread {
+                        if (delay>0)
+                            Handler().postDelayed({
+                                eventConsumer.invoke(event)
+                            }, delay)
+                        else eventConsumer.invoke(event)
+                    }
+                }
         }
     }
 

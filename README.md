@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'com.github.andob:ActivityResultEventBus:1.0.1'
+    implementation 'com.github.andob:ActivityResultEventBus:1.0.2'
 }
 ```
 
@@ -37,6 +37,12 @@ catButton.setOnClickListener {
 }
 ```
 
+You can also post an event after a delay:
+
+```kotlin
+ActivityResultEventBus.post(OnCatChoosedEvent(cat), delay = 100) //100ms
+```
+
 - Receive events in the ``MainActivity`` context:
 
 ```kotlin
@@ -47,6 +53,8 @@ OnActivityResult<OnCatChoosedEvent> { event ->
 ```
 
 ``OnActivityResult`` is an extension function available for ``Activity``, ``Fragment`` and ``View`` classes.
+
+All events will be received on UI thread.
 
 - Register the EventBus in ``BaseActivity``:
 
