@@ -35,14 +35,23 @@ object ActivityResultEventBus
             activityData.eventListeners
                 .find { it.type==eventClass }
                 ?.let { eventListener ->
-                    activityData.activity.runOnUiThread {
-                        if (delay>0)
-                            Handler().postDelayed({
-                                eventListener.invoke(event)
-                            }, delay)
-                        else eventListener.invoke(event)
-                    }
+                    postOnEventListener(eventListener, activityData, event, delay)
                 }
+        }
+    }
+
+    private fun <EVENT : Any> postOnEventListener(eventListener : TypedEventListener<Any>,
+                                                  activityData : ActivityData,
+                                                  event : EVENT, delay : Long = 0L)
+    {
+        if (!activityData.isActivityInForeground)
+            Handler().post { postOnEventListener(eventListener, activityData, event, delay) }
+        else activityData.activity.runOnUiThread {
+            if (delay>0)
+                Handler().postDelayed({
+                    eventListener.invoke(event)
+                }, delay)
+            else eventListener.invoke(event)
         }
     }
 
