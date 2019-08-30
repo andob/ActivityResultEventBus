@@ -11,9 +11,15 @@ abstract class BaseActivity : AppCompatActivity()
         ActivityResultEventBus.onActivityPostResumed(this)
     }
 
+    override fun onPause()
+    {
+        super.onPause()
+        ActivityResultEventBus.onActivityPaused(this)
+    }
+
     override fun onDestroy()
     {
-        super.onDestroy()
         ActivityResultEventBus.onActivityDestroyed(this)
+        super.onDestroy()
     }
 }

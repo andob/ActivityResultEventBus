@@ -5,40 +5,42 @@ import android.os.Handler
 import android.view.View
 import androidx.fragment.app.Fragment
 
-class ActivityResultTypedEventListener<EVENT>
-(
-    val eventClass : Class<EVENT>,
-    val eventConsumer : (EVENT) -> (Unit)
-)
-{
-    var wasTriggered = false
-}
-
 object ActivityResultEventBus
 {
-    private val data : MutableMap<Activity, MutableList<ActivityResultTypedEventListener<*>>> = mutableMapOf()
+    private class ActivityData
+    (
+        var activity : Activity
+    )
+    {
+        var isActivityInForeground = false
+        var eventListeners = mutableListOf<TypedEventListener<Any>>()
+    }
+
+    private class TypedEventListener<EVENT>
+    (
+        val type : Class<EVENT>,
+        val listener : (EVENT) -> (Unit)
+    ) : (EVENT) -> (Unit)
+    {
+        override fun invoke(event : EVENT) = listener.invoke(event)
+    }
+
+    private val data = mutableListOf<ActivityData>()
 
     fun <EVENT : Any> post(event : EVENT, delay : Long = 0L)
     {
         val eventClass=event::class.java
-        for ((activity, eventListeners) in data)
+        for (activityData in data)
         {
-            eventListeners.find { it.eventClass==eventClass }
+            activityData.eventListeners
+                .find { it.type==eventClass }
                 ?.let { eventListener ->
-                    val eventConsumer=eventListener.eventConsumer as (EVENT) -> (Unit)
-                    activity.runOnUiThread {
+                    activityData.activity.runOnUiThread {
                         if (delay>0)
-                        {
                             Handler().postDelayed({
-                                eventConsumer.invoke(event)
-                                eventListener.wasTriggered=true
+                                eventListener.invoke(event)
                             }, delay)
-                        }
-                        else
-                        {
-                            eventConsumer.invoke(event)
-                            eventListener.wasTriggered=true
-                        }
+                        else eventListener.invoke(event)
                     }
                 }
         }
@@ -46,31 +48,48 @@ object ActivityResultEventBus
 
     fun onActivityPostResumed(activity : Activity)
     {
-        //activity was resumed, onActivityPostResumed event listeners
-        if (data[activity]?.isEmpty()==false)
-            data[activity]!!.removeAll { it.wasTriggered }
+        val activityData=data.find { it.activity==activity }
+        if (activityData?.eventListeners?.isEmpty()==false)
+        {
+            activityData.eventListeners=mutableListOf()
+            activityData.isActivityInForeground=true
+        }
     }
 
-    fun registerActivityEventListener(activity : Activity, eventListener: ActivityResultTypedEventListener<*>)
+    fun onActivityPaused(activity : Activity)
     {
-        //activity was created
-        val eventListeners=data[activity]?:mutableListOf()
-        eventListeners.add(eventListener)
-        data[activity]=eventListeners
+        val activityData=data.find { it.activity==activity }
+        if (activityData!=null)
+            activityData.isActivityInForeground=false
+    }
+
+    fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
+    {
+        var activityData=data.find { it.activity==activity }
+        if (activityData?.isActivityInForeground==true)
+            Handler().post { registerActivityEventListener(activity, eventType, eventListener) }
+        else
+        {
+            activityData=activityData?:ActivityData(activity)
+            activityData.eventListeners.add(TypedEventListener(type = eventType, listener = eventListener) as TypedEventListener<Any>)
+
+            if (!data.contains(activityData))
+                data.add(activityData)
+        }
     }
 
     fun onActivityDestroyed(activity : Activity)
     {
-        //activity was destroyed
-        if (data.containsKey(activity))
-            data.remove(activity)
+        val activityData=data.find { it.activity==activity }
+        if (activityData!=null)
+            data.remove(activityData)
     }
 }
 
 inline fun <reified EVENT> Activity.OnActivityResult(noinline eventListener : (EVENT) -> (Unit))
 {
     ActivityResultEventBus.registerActivityEventListener(activity = this,
-        eventListener = ActivityResultTypedEventListener(EVENT::class.java, eventListener))
+        eventType = EVENT::class.java, eventListener = eventListener)
 }
 
 inline fun <reified EVENT> Fragment.OnActivityResult(noinline eventListener : (EVENT) -> (Unit))

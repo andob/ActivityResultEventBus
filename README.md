@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'com.github.andob:ActivityResultEventBus:1.0.3'
+    implementation 'com.github.andob:ActivityResultEventBus:1.0.4'
 }
 ```
 
@@ -66,11 +66,17 @@ abstract class BaseActivity : AppCompatActivity()
         super.onPostResume()
         ActivityResultEventBus.onActivityPostResumed(this)
     }
+    
+    override fun onPause()
+    {
+        super.onPause()
+        ActivityResultEventBus.onActivityPaused(this)
+    }
 
     override fun onDestroy()
     {
-        super.onDestroy()
         ActivityResultEventBus.onActivityDestroyed(this)
+        super.onDestroy()
     }
 }
 ```
