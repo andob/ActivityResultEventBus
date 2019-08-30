@@ -50,10 +50,9 @@ object ActivityResultEventBus
     {
         val activityData=data.find { it.activity==activity }
         if (activityData?.eventListeners?.isEmpty()==false)
-        {
             activityData.eventListeners=mutableListOf()
+        if (activityData!=null)
             activityData.isActivityInForeground=true
-        }
     }
 
     fun onActivityPaused(activity : Activity)
