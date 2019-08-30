@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'com.github.andob:ActivityResultEventBus:1.0.2'
+    implementation 'com.github.andob:ActivityResultEventBus:1.0.3'
 }
 ```
 

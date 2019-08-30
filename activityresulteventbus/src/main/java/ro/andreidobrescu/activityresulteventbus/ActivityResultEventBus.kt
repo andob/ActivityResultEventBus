@@ -10,6 +10,9 @@ class ActivityResultTypedEventListener<EVENT>
     val eventClass : Class<EVENT>,
     val eventConsumer : (EVENT) -> (Unit)
 )
+{
+    var wasTriggered = false
+}
 
 object ActivityResultEventBus
 {
@@ -25,10 +28,17 @@ object ActivityResultEventBus
                     val eventConsumer=eventListener.eventConsumer as (EVENT) -> (Unit)
                     activity.runOnUiThread {
                         if (delay>0)
+                        {
                             Handler().postDelayed({
                                 eventConsumer.invoke(event)
+                                eventListener.wasTriggered=true
                             }, delay)
-                        else eventConsumer.invoke(event)
+                        }
+                        else
+                        {
+                            eventConsumer.invoke(event)
+                            eventListener.wasTriggered=true
+                        }
                     }
                 }
         }
@@ -38,7 +48,7 @@ object ActivityResultEventBus
     {
         //activity was resumed, onActivityPostResumed event listeners
         if (data[activity]?.isEmpty()==false)
-            data[activity]=mutableListOf()
+            data[activity]!!.removeAll { it.wasTriggered }
     }
 
     fun registerActivityEventListener(activity : Activity, eventListener: ActivityResultTypedEventListener<*>)
