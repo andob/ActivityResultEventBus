@@ -66,7 +66,7 @@ object ActivityResultEventBus
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
     {
         var activityData=data.find { it.activity==activity }
-        if (activityData?.isActivityInForeground==true)
+        if (activityData?.isActivityInForeground==false)
             Handler().post { registerActivityEventListener(activity, eventType, eventListener) }
         else
         {
