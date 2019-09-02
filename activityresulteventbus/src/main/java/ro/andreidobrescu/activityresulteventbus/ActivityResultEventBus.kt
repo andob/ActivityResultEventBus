@@ -55,35 +55,39 @@ object ActivityResultEventBus
         }
     }
 
+    private fun findOrCreateActivityData(activity : Activity) : ActivityData
+    {
+        var activityData=data.find { it.activity==activity }
+        if (activityData==null)
+        {
+            activityData=ActivityData(activity)
+            data.add(activityData)
+        }
+
+        return activityData
+    }
+
     fun onActivityPostResumed(activity : Activity)
     {
-        val activityData=data.find { it.activity==activity }
-        if (activityData?.eventListeners?.isEmpty()==false)
+        val activityData=findOrCreateActivityData(activity)
+        activityData.isActivityInForeground=true
+
+        if (activityData.eventListeners.isNotEmpty())
             activityData.eventListeners=mutableListOf()
-        if (activityData!=null)
-            activityData.isActivityInForeground=true
     }
 
     fun onActivityPaused(activity : Activity)
     {
-        val activityData=data.find { it.activity==activity }
-        if (activityData!=null)
-            activityData.isActivityInForeground=false
+        val activityData=findOrCreateActivityData(activity)
+        activityData.isActivityInForeground=false
     }
 
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
     {
-        var activityData=data.find { it.activity==activity }
-        if (activityData?.isActivityInForeground==false)
+        val activityData=findOrCreateActivityData(activity)
+        if (!activityData.isActivityInForeground)
             Handler().post { registerActivityEventListener(activity, eventType, eventListener) }
-        else
-        {
-            activityData=activityData?:ActivityData(activity)
-            activityData.eventListeners.add(TypedEventListener(type = eventType, listener = eventListener) as TypedEventListener<Any>)
-
-            if (!data.contains(activityData))
-                data.add(activityData)
-        }
+        else activityData.eventListeners.add(TypedEventListener(type = eventType, listener = eventListener) as TypedEventListener<Any>)
     }
 
     fun onActivityDestroyed(activity : Activity)
