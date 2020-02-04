@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'com.github.andob:ActivityResultEventBus:1.0.8'
+    implementation 'com.github.andob:ActivityResultEventBus:1.1.0'
 }
 ```
 
@@ -80,6 +80,57 @@ abstract class BaseActivity : AppCompatActivity()
     }
 }
 ```
+
+### Example usage in Java
+
+```java
+ActivityResultEventBus.INSTANCE.post(new OnCatChoosedEvent(cat));
+```
+
+```java
+class BaseActivity2 extends AppCompatActivity
+{
+    @Override
+    protected void onPostResume()
+    {
+        super.onPostResume();
+        ActivityResultEventBus.INSTANCE.onActivityPostResumed(this);
+    }
+
+    @Override
+    protected void onPause()
+    {
+        ActivityResultEventBus.INSTANCE.onActivityPaused(this);
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        ActivityResultEventBus.INSTANCE.onActivityDestroyed(this);
+        super.onDestroy();
+    }
+
+    public <EVENT> void onActivityResult(Class<EVENT> eventType, JActivityResultEventListener<EVENT> eventListener)
+    {
+        ActivityResultEventBus.INSTANCE.registerActivityEventListener(this, eventType, eventListener);
+    }
+}
+```
+
+```java
+class MainActivity2 extends BaseActivity2
+{
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        startActivity(new Intent(this, CatListActivity.class));
+        onActivityResult(OnCatChoosedEvent.class, event -> System.out.println(event.getCat()));
+    }
+}
+```        
 
 ### License
 

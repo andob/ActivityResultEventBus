@@ -27,7 +27,9 @@ object ActivityResultEventBus
 
     private val data = mutableListOf<ActivityData>()
 
-    fun <EVENT : Any> post(event : EVENT, delay : Long = 0L)
+    fun <EVENT : Any> post(event : EVENT) = post(event, delay = 0L)
+
+    fun <EVENT : Any> post(event : EVENT, delay : Long)
     {
         val eventClass=event::class.java
         for (activityData in data)
@@ -82,6 +84,13 @@ object ActivityResultEventBus
         activityData.isActivityInForeground=false
     }
 
+    fun onActivityDestroyed(activity : Activity)
+    {
+        val activityData=data.find { it.activity==activity }
+        if (activityData!=null)
+            data.remove(activityData)
+    }
+
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
     {
         val activityData=findOrCreateActivityData(activity)
@@ -90,11 +99,10 @@ object ActivityResultEventBus
         else activityData.eventListeners.add(TypedEventListener(type = eventType, listener = eventListener) as TypedEventListener<Any>)
     }
 
-    fun onActivityDestroyed(activity : Activity)
+    fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : JActivityResultEventListener<EVENT>)
     {
-        val activityData=data.find { it.activity==activity }
-        if (activityData!=null)
-            data.remove(activityData)
+        registerActivityEventListener(activity = activity, eventType = eventType,
+            eventListener = { event -> eventListener.notify(event) })
     }
 }
 
