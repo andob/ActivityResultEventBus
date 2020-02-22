@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'com.github.andob:ActivityResultEventBus:1.1.0'
+    implementation 'com.github.andob:ActivityResultEventBus:1.1.1'
 }
 ```
 
@@ -130,7 +130,7 @@ class MainActivity2 extends BaseActivity2
         onActivityResult(OnCatChoosedEvent.class, event -> System.out.println(event.getCat()));
     }
 }
-```        
+```
 
 ### License
 

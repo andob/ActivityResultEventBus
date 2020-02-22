@@ -1,7 +1,9 @@
 package ro.andreidobrescu.activityresulteventbus
 
 import android.app.Activity
+import android.content.ContextWrapper
 import android.os.Handler
+import android.view.ContextThemeWrapper
 import android.view.View
 import androidx.fragment.app.Fragment
 
@@ -119,5 +121,14 @@ inline fun <reified EVENT> Fragment.OnActivityResult(noinline eventListener : (E
 
 inline fun <reified EVENT> View.OnActivityResult(noinline eventListener : (EVENT) -> (Unit))
 {
-    (context as Activity).OnActivityResult(eventListener)
+    var lookupContext=context
+
+    do
+    {
+        if (lookupContext is Activity)
+            lookupContext.OnActivityResult(eventListener)
+        else if (lookupContext is ContextThemeWrapper&&lookupContext.baseContext!=null)
+            lookupContext=lookupContext.baseContext
+    }
+    while (lookupContext !is Activity)
 }
