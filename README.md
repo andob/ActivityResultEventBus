@@ -132,6 +132,9 @@ class MainActivity2 extends BaseActivity2
 }
 ```
 
+
+### [Vanilla onActivityResult vs GreenRobot EventBus vs ActivityResultEventBus comparison](https://github.com/andob/ActivityResultEventBus/blob/master/COMPARISON.md)
+
 ### License
 
 ```java
