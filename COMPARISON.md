@@ -37,7 +37,7 @@ class MainActivity : BaseActivity()
         setContentView(R.layout.activity_main)
 
         catLabel.setOnClickListener {
-            val intent=Intent(this, CatChooserActivity::class.java)
+            val intent = Intent(this, CatChooserActivity::class.java)
             startActivityForResult(intent, REQUEST_CHOOSE_CAT)
         }
     }
@@ -46,10 +46,10 @@ class MainActivity : BaseActivity()
     {
         super.onActivityResult(requestCode, resultCode, data)
         
-        if (requestCode==REQUEST_CHOOSE_CAT&&resultCode==Activity.RESULT_OK&&
-            data!=null&&data.hasExtra("cat"))
+        if (requestCode == REQUEST_CHOOSE_CAT && resultCode == Activity.RESULT_OK&&
+            data != null && data.hasExtra("cat"))
         {
-            val cat=data.getSerializableExtra("cat") as Cat
+            val cat = data.getSerializableExtra("cat") as Cat
             println(cat)
         }
     }
@@ -218,7 +218,7 @@ class MainActivity : BaseActivity()
 
         scanRestaurantQRCodeButton.setOnClickListener {
             Intent(this, QRCodeScannerActivity::class.java)
-            shouldOpenRestaurantDetailsOnQRCodeScanned=true
+            shouldOpenRestaurantDetailsOnQRCodeScanned = true
         }
 
         addReviewButton.setOnClickListener { 
@@ -229,8 +229,8 @@ class MainActivity : BaseActivity()
                 },
                 onReviewOptionSelected = { reviewOption ->
                     Intent(this, QRCodeScannerActivity::class.java)
-                    shouldAssignRatingOnQRCodeScanned=true
-                    ratingToAssignOnQrCodeScanned=reviewOption.rating
+                    shouldAssignRatingOnQRCodeScanned = true
+                    ratingToAssignOnQrCodeScanned = reviewOption.rating
                 })
         }
     }
@@ -247,16 +247,17 @@ class MainActivity : BaseActivity()
                         .restaurantId(restaurantId)
                         .startActivity(this)
                 }
-                else if (shouldAssignRatingOnQRCodeScanned&&ratingToAssignOnQrCodeScanned!=null)
+                else if (shouldAssignRatingOnQRCodeScanned && ratingToAssignOnQrCodeScanned!=null)
                 {
-                    //todo presenter.assignRating(restaurantId = restaurantId, rating = ratingToAssignOnQrCodeScanned)
+                    //todo presenter.assignRating(restaurantId = restaurantId, 
+                    //rating = ratingToAssignOnQrCodeScanned)
                 }
             }
         }
         
-        shouldOpenRestaurantDetailsOnQRCodeScanned=false
-        shouldAssignRatingOnQRCodeScanned=false
-        ratingToAssignOnQrCodeScanned=null
+        shouldOpenRestaurantDetailsOnQRCodeScanned = false
+        shouldAssignRatingOnQRCodeScanned = false
+        ratingToAssignOnQrCodeScanned = null
     }
 }
 ```
@@ -281,7 +282,7 @@ class MainActivity : BaseActivity()
 
         scanRestaurantQRCodeButton.setOnClickListener {
             Intent(this, QRCodeScannerActivity::class.java)
-            onRestaurantQrCodeScanned={ restaurantId ->
+            onRestaurantQrCodeScanned = { restaurantId ->
                 RestaurantDetailsActivityBundleBuilder()
                     .restaurantId(restaurantId.value)
                     .startActivity(this)
@@ -297,7 +298,8 @@ class MainActivity : BaseActivity()
                 onReviewOptionSelected = { reviewOption ->
                     Intent(this, QRCodeScannerActivity::class.java)
                     onRestaurantQrCodeScanned={ restaurantId ->
-                        //todo presenter.assignRating(restaurantId = restaurantId, rating = ratingToAssignOnQrCodeScanned)
+                        //todo presenter.assignRating(restaurantId = restaurantId, 
+                        //rating = ratingToAssignOnQrCodeScanned)
                     }
                 })
         }
@@ -313,12 +315,12 @@ class MainActivity : BaseActivity()
             }
         }
         
-        onRestaurantQrCodeScanned=null
+        onRestaurantQrCodeScanned = null
     }
 
     override fun onDestroy()
     {
-        onRestaurantQrCodeScanned=null
+        onRestaurantQrCodeScanned = null
         super.onDestroy()
     }
 }
@@ -359,8 +361,8 @@ object QRCodeRestaurantUrlParser
     {
         if (url.startsWith("http://example.com/restaurant/"))
         {
-            val restaurantIdValue=url.split("/").last().toIntOrNull()
-            if (restaurantIdValue!=null)
+            val restaurantIdValue = url.split("/").last().toIntOrNull()
+            if (restaurantIdValue != null)
                 return ID<Restaurant>(restaurantIdValue)
         }
         
@@ -377,32 +379,43 @@ class MainActivity : BaseActivity()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        scanRestaurantQRCodeButton.setOnClickListener {
-            Intent(this, QRCodeScannerActivity::class.java)
-            OnActivityResult<OnQRCodeScannedEvent> { event ->
-                QRCodeRestaurantUrlParser.parse(event.url)?.let { restaurantId ->
-                    RestaurantDetailsActivityBundleBuilder()
-                        .restaurantId(restaurantId.value)
-                        .startActivity(this)
-                }
-            }
+        scanRestaurantQRCodeButton.setOnClickListener { 
+            onScanRestaurantQRCodeButtonClicked()
         }
 
         addReviewButton.setOnClickListener { 
-            ReviewDialog.show(
-                title = "Please select a rating",
-                reviewOptions = (1..5).toList().map { rating ->
-                    ReviewDialog.ReviewOption(description = "$rating stars", rating = rating)
-                },
-                onReviewOptionSelected = { reviewOption ->
-                    Intent(this, QRCodeScannerActivity::class.java)
-                    OnActivityResult<OnQRCodeScannedEvent> { event ->
-                        QRCodeRestaurantUrlParser.parse(event.url)?.let { restaurantId ->
-                            //todo presenter.assignRating(restaurantId = restaurantId, rating = ratingToAssignOnQrCodeScanned)
-                        }
-                    }
-                })
+            onAddReviewButtonClicked()
         }
+    }
+    
+    private fun onScanRestaurantQRCodeButtonClicked()
+    {
+        Intent(this, QRCodeScannerActivity::class.java)
+        OnActivityResult<OnQRCodeScannedEvent> { event ->
+            QRCodeRestaurantUrlParser.parse(event.url)?.let { restaurantId ->
+                RestaurantDetailsActivityBundleBuilder()
+                    .restaurantId(restaurantId.value)
+                    .startActivity(this)
+            }
+        }
+    }
+    
+    private fun onAddReviewButtonClicked()
+    {
+        ReviewDialog.show(
+            title = "Please select a rating",
+            reviewOptions = (1..5).toList().map { rating ->
+                ReviewDialog.ReviewOption(description = "$rating stars", rating = rating)
+            },
+            onReviewOptionSelected = { reviewOption ->
+                Intent(this, QRCodeScannerActivity::class.java)
+                OnActivityResult<OnQRCodeScannedEvent> { event ->
+                    QRCodeRestaurantUrlParser.parse(event.url)?.let { restaurantId ->
+                        //todo presenter.assignRating(restaurantId = restaurantId, 
+                        //rating = ratingToAssignOnQrCodeScanned)
+                    }
+                }
+            })
     }
 }
 ```
@@ -410,4 +423,4 @@ class MainActivity : BaseActivity()
 ActivityResultEventBus disadvantages:
 
 1. ActivityResultEventBus should be used only as an onActivityResult replacement. On any other use cases (for instance, sending a ``UpdateBackgroundColorEvent`` to all background activities), please use a general-purpose event bus, such as GreenRobot EventBus.
-2. Composing code blocks and lambdas can lead to "callback hell". Still, this is completely manageable by organising methods: not having a gigantic method, but splitting it into smaller methods.
+2. Composing code blocks and lambdas can lead to "callback hell". Still, this is completely manageable by organising methods: not having a gigantic method, but splitting it into smaller methods. For instance, in the last example, the code is splitted into three methods: ``onCreate``, ``onScanRestaurantQRCodeButtonClicked`` and ``onAddReviewButtonClicked``, instead of keeping all the code inside ``onCreate``
