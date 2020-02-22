@@ -56,9 +56,9 @@ class MainActivity : BaseActivity()
 }
 ```
 
-Sure, it looks okish now because the example is trivial. As the project grow, it will get harder and harder to mantain this serialization / deserialization code, request codes, result codes. Furthermore, the compile doesn't help you at all!! Because the intent serialization and deserialization is not compile time checked.
+Sure, it looks okish now because the example is trivial. As the project grow, it will get harder and harder to mantain this serialization / deserialization code, request codes, result codes. Furthermore, the compiler doesn't help you at all!!
 
-The code also looks very verbose. Verbosity and boilerplate is evil on the long run, on big projects. We should write code as simple as possible. Because the project can always get a lot of features and can get very complicated, why shall we complicate doing trivial tasks?
+The code also looks very verbose. Verbosity and boilerplate is evil on the long run, on big projects. We should write code as simple as possible. Because the project can always get a lot of features and can get very complicated, why shall we do trivial tasks using complicated approaches?
 
 The vanilla way is also not suitable for navigation flow logic. But this also applies to GreenRobot EventBus. We'll discuss this in the next section.
 
@@ -109,7 +109,7 @@ class MainActivity : BaseActivity()
 
 This looks so nice! But still, we can identify two problems with this approach.
 
-The ``onCatChoosed(event)`` method from ``MainActivity`` is called before activity's ``onResume``. This is ok, but it can lead to some subtile bugs, which can be easily avoided. But I believe it's not a big deal, IMHO we should put code cleanness before everything else, including bugs.
+The ``onCatChoosed(event)`` method from ``MainActivity`` is called before activity's ``onResume``. This is ok, but it can lead to some subtle bugs, which can be easily avoided. But I believe it's not a big deal, IMHO we should put code cleanness before everything else, including bugs.
 
 The second problem is that forcing to write a class-level method to handle the event is not quite suitable for complex navigation flow logic. This problem also applies to the vanilla onActivityResult. Let's look at the following example:
 
@@ -324,7 +324,7 @@ class MainActivity : BaseActivity()
 }
 ```
 
-Now the event is no longer handled inside another class method (``onQRCodeScanned``), but rather handled inline with the actual navigation flow code.
+Now the event is no longer handled inside another class method (``onQRCodeScanned``), but rather handled inline with the actual navigation flow code. We won't ever need a mutable state, saved on the wrong scope, because lambdas are also closures.
 
 ### ActivityResultEventBus
 
@@ -334,8 +334,6 @@ ActivityResultEventBus solves all these problems:
 2. Events are received after onResume
 3. Events are received via lambda expressions. Not using a class method avoids side effects and spaghetti code.
 4. If activity A starts activity B, events sent by B can be only received by activity A, after activity B is destoryed and after activity A resumes.
-
-Thus, ActivityResultEventBus should not be used for other use cases than onActivityResult replacement. On any other use cases (for instance, sending a ``UpdateBackgroundColorEvent`` to all background activities), please use a general-purpose event bus, such as GreenRobot EventBus.
 
 The last example using ActivityResultEventBus:
 
@@ -408,3 +406,8 @@ class MainActivity : BaseActivity()
     }
 }
 ```
+
+ActivityResultEventBus disadvantages:
+
+1. ActivityResultEventBus should be used only as an onActivityResult replacement. On any other use cases (for instance, sending a ``UpdateBackgroundColorEvent`` to all background activities), please use a general-purpose event bus, such as GreenRobot EventBus.
+2. Composing code blocks and lambdas can lead to "callback hell". Still, this is completely manageable by organising methods: not having a gigantic method, but splitting it into smaller methods.
