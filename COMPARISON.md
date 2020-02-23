@@ -299,7 +299,7 @@ class MainActivity : BaseActivity()
                     Intent(this, QRCodeScannerActivity::class.java)
                     onRestaurantQrCodeScanned={ restaurantId ->
                         //todo presenter.assignRating(restaurantId = restaurantId, 
-                        //rating = ratingToAssignOnQrCodeScanned)
+                        //rating = reviewOption.rating)
                     }
                 })
         }
@@ -326,7 +326,7 @@ class MainActivity : BaseActivity()
 }
 ```
 
-Now the event is no longer handled inside another class method (``onQRCodeScanned``), but rather handled inline with the actual navigation flow code. We won't ever need a mutable state, saved on the wrong scope, because lambdas are also closures.
+Now the event is no longer handled inside another class method (``onQRCodeScanned``), but rather handled inline with the actual navigation flow code. We won't ever need a mutable state, saved on the wrong scope, because lambdas are also closures. Thus, we can access immutable states (variables) from the outside of the lambda, without having to save them as class fields (saving them as class fields would be a hack, right?).
 
 ### ActivityResultEventBus
 
@@ -412,7 +412,7 @@ class MainActivity : BaseActivity()
                 OnActivityResult<OnQRCodeScannedEvent> { event ->
                     QRCodeRestaurantUrlParser.parse(event.url)?.let { restaurantId ->
                         //todo presenter.assignRating(restaurantId = restaurantId, 
-                        //rating = ratingToAssignOnQrCodeScanned)
+                        //rating = reviewOption.rating)
                     }
                 }
             })
