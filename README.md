@@ -5,13 +5,13 @@ Tiny simple EventBus to handle activity result-like behaviors
 ```
 allprojects {
     repositories {
-        maven { url 'https://jitpack.io' }
+        maven { url 'http://maven.andob.info/reporitory/open_source' }
     }
 }
 ```
 ```
 dependencies {
-    implementation 'com.github.andob:ActivityResultEventBus:1.1.1'
+    implementation 'ro.andob.activityresult:eventbus:1.1.2'
 }
 ```
 
