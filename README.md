@@ -5,7 +5,7 @@ Tiny simple EventBus to handle activity result-like behaviors
 ```
 allprojects {
     repositories {
-        maven { url 'http://maven.andob.info/reporitory/open_source' }
+        maven { url 'http://maven.andob.info/repository/open_source' }
     }
 }
 ```
