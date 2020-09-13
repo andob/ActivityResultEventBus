@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:1.1.2'
+    implementation 'ro.andob.activityresult:eventbus:1.1.3'
 }
 ```
 
