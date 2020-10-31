@@ -3,6 +3,7 @@ package ro.andreidobrescu.activityresulteventbus
 import android.app.Activity
 import android.content.ContextWrapper
 import android.os.Handler
+import android.os.Looper
 import android.view.ContextThemeWrapper
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -49,13 +50,25 @@ object ActivityResultEventBus
                                                   event : EVENT, delay : Long = 0L)
     {
         if (!activityData.isActivityInForeground)
-            Handler().post { postOnEventListener(eventListener, activityData, event, delay) }
-        else activityData.activity.runOnUiThread {
-            if (delay>0)
-                Handler().postDelayed({
+        {
+            Handler(Looper.getMainLooper()).post {
+                postOnEventListener(eventListener, activityData, event, delay)
+            }
+        }
+        else
+        {
+            activityData.activity.runOnUiThread {
+                if (delay>0)
+                {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        eventListener.invoke(event)
+                    }, delay)
+                }
+                else
+                {
                     eventListener.invoke(event)
-                }, delay)
-            else eventListener.invoke(event)
+                }
+            }
         }
     }
 
@@ -93,12 +106,22 @@ object ActivityResultEventBus
             data.remove(activityData)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
     {
         val activityData=findOrCreateActivityData(activity)
         if (!activityData.isActivityInForeground)
-            Handler().post { registerActivityEventListener(activity, eventType, eventListener) }
-        else activityData.eventListeners.add(TypedEventListener(type = eventType, listener = eventListener) as TypedEventListener<Any>)
+        {
+            Handler(Looper.getMainLooper()).post {
+                registerActivityEventListener(activity, eventType, eventListener)
+            }
+        }
+        else
+        {
+            activityData.eventListeners.add(
+                TypedEventListener(type = eventType, listener = eventListener)
+                    as TypedEventListener<Any>)
+        }
     }
 
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : JActivityResultEventListener<EVENT>)
