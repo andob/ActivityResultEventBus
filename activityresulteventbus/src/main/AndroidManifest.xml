@@ -1,2 +1,15 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="ro.andreidobrescu.activityresulteventbus"/>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ro.andreidobrescu.activityresulteventbus">
+
+    <application>
+
+        <activity
+            android:name=".PermissionAskerActivity"
+            android:configChanges="${configChanges}"
+            android:windowSoftInputMode="stateHidden"
+            android:theme="@style/TransparentDialogTheme"/>
+
+    </application>
+
+</manifest>

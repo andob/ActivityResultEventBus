@@ -9,4 +9,6 @@ echo "Publishing..."
 
 ./gradlew :activityresulteventbus:publish
 
+read -s -r XYZ
+
 set +o allexport

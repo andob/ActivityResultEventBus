@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "ro.andreidobrescu.activityresulteventbus"
+        applicationId "ro.andreidobrescu.activityresulteventbussample"
         minSdkVersion 14
         targetSdkVersion 30
         versionCode 1

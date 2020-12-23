@@ -131,17 +131,20 @@ object ActivityResultEventBus
     }
 }
 
+@Suppress("FunctionName")
 inline fun <reified EVENT> Activity.OnActivityResult(noinline eventListener : (EVENT) -> (Unit))
 {
     ActivityResultEventBus.registerActivityEventListener(activity = this,
         eventType = EVENT::class.java, eventListener = eventListener)
 }
 
+@Suppress("FunctionName")
 inline fun <reified EVENT> Fragment.OnActivityResult(noinline eventListener : (EVENT) -> (Unit))
 {
     activity?.OnActivityResult(eventListener)
 }
 
+@Suppress("FunctionName")
 inline fun <reified EVENT> View.OnActivityResult(noinline eventListener : (EVENT) -> (Unit))
 {
     var lookupContext=context

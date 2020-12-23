@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:1.1.3'
+    implementation 'ro.andob.activityresult:eventbus:1.1.4'
 }
 ```
 
@@ -134,6 +134,17 @@ class MainActivity2 extends BaseActivity2
 
 
 ### [Vanilla onActivityResult vs GreenRobot EventBus vs ActivityResultEventBus comparison](https://github.com/andob/ActivityResultEventBus/blob/master/COMPARISON.md)
+
+### Permission asker
+
+From version 1.1.4 and on, you can use this library to ask for permissions:
+
+```kotlin
+PermissionAskerActivity.ask(it.context, android.Manifest.permission.CAMERA)
+OnActivityResult<OnPermissionsGrantedEvent> { event ->
+    //take picture
+}
+```
 
 ### License
 
