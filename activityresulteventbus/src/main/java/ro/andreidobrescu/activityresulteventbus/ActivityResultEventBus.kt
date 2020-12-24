@@ -90,11 +90,11 @@ object ActivityResultEventBus
         val activityData=findOrCreateActivityData(activity)
         activityData.isActivityInForeground=true
 
-        while(activityData.actionsToDoAfterActivityComesToForeground.isNotEmpty())
-            activityData.actionsToDoAfterActivityComesToForeground.remove().invoke()
-
         if (activityData.eventListeners.isNotEmpty())
             activityData.eventListeners=mutableListOf()
+
+        while(activityData.actionsToDoAfterActivityComesToForeground.isNotEmpty())
+            activityData.actionsToDoAfterActivityComesToForeground.remove().invoke()
     }
 
     fun onActivityPaused(activity : Activity)
