@@ -7,8 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -58,11 +56,8 @@ class PermissionAskerActivity : Activity()
                     intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK
                     applicationContext.startActivity(intent)
 
-                    //race condition
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        ActivityResultEventBus.post(OnPermissionsDeniedEvent())
-                        finish()
-                    }, 50)
+                    ActivityResultEventBus.post(OnPermissionsDeniedEvent())
+                    finish()
                 }
                 else
                 {
@@ -71,20 +66,14 @@ class PermissionAskerActivity : Activity()
             }
             else
             {
-                //race condition
-                Handler(Looper.getMainLooper()).postDelayed({
-                    ActivityResultEventBus.post(OnPermissionsGrantedEvent())
-                    finish()
-                }, 50)
+                ActivityResultEventBus.post(OnPermissionsGrantedEvent())
+                finish()
             }
         }
         else
         {
-            //race condition
-            Handler(Looper.getMainLooper()).postDelayed({
-                ActivityResultEventBus.post(OnPermissionsGrantedEvent())
-                finish()
-            }, 50)
+            ActivityResultEventBus.post(OnPermissionsGrantedEvent())
+            finish()
         }
     }
 

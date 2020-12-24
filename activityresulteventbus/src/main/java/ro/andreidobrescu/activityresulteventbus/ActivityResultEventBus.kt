@@ -110,18 +110,9 @@ object ActivityResultEventBus
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
     {
         val activityData=findOrCreateActivityData(activity)
-        if (!activityData.isActivityInForeground)
-        {
-            Handler(Looper.getMainLooper()).post {
-                registerActivityEventListener(activity, eventType, eventListener)
-            }
-        }
-        else
-        {
-            activityData.eventListeners.add(
-                TypedEventListener(type = eventType, listener = eventListener)
-                    as TypedEventListener<Any>)
-        }
+        activityData.eventListeners.add(
+            TypedEventListener(type = eventType, listener = eventListener)
+                as TypedEventListener<Any>)
     }
 
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : JActivityResultEventListener<EVENT>)
