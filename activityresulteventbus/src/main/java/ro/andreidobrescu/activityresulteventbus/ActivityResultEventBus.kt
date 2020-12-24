@@ -1,12 +1,12 @@
 package ro.andreidobrescu.activityresulteventbus
 
 import android.app.Activity
-import android.content.ContextWrapper
 import android.os.Handler
 import android.os.Looper
 import android.view.ContextThemeWrapper
 import android.view.View
 import androidx.fragment.app.Fragment
+import java.util.*
 
 object ActivityResultEventBus
 {
@@ -16,6 +16,7 @@ object ActivityResultEventBus
     )
     {
         var isActivityInForeground = false
+        val actionsToDoAfterActivityComesToForeground : Queue<() -> (Unit)> = LinkedList()
         var eventListeners = mutableListOf<TypedEventListener<Any>>()
     }
 
@@ -51,7 +52,7 @@ object ActivityResultEventBus
     {
         if (!activityData.isActivityInForeground)
         {
-            Handler(Looper.getMainLooper()).post {
+            activityData.actionsToDoAfterActivityComesToForeground.add {
                 postOnEventListener(eventListener, activityData, event, delay)
             }
         }
@@ -89,6 +90,9 @@ object ActivityResultEventBus
         val activityData=findOrCreateActivityData(activity)
         activityData.isActivityInForeground=true
 
+        while(activityData.actionsToDoAfterActivityComesToForeground.isNotEmpty())
+            activityData.actionsToDoAfterActivityComesToForeground.remove().invoke()
+
         if (activityData.eventListeners.isNotEmpty())
             activityData.eventListeners=mutableListOf()
     }
@@ -110,9 +114,18 @@ object ActivityResultEventBus
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
     {
         val activityData=findOrCreateActivityData(activity)
-        activityData.eventListeners.add(
-            TypedEventListener(type = eventType, listener = eventListener)
-                as TypedEventListener<Any>)
+        if (!activityData.isActivityInForeground)
+        {
+            activityData.actionsToDoAfterActivityComesToForeground.add {
+                registerActivityEventListener(activity, eventType, eventListener)
+            }
+        }
+        else
+        {
+            activityData.eventListeners.add(
+                TypedEventListener(type = eventType, listener = eventListener)
+                    as TypedEventListener<Any>)
+        }
     }
 
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : JActivityResultEventListener<EVENT>)
