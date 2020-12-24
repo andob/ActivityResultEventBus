@@ -47,7 +47,7 @@ publishing {
                 from components.findByName("android${variant.name.capitalize()}")
                 groupId 'ro.andob.activityresult'
                 artifactId 'eventbus'
-                version '1.1.4'
+                version '1.1.5'
             }
         }
     }

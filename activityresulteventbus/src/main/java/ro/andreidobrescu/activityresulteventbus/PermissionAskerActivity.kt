@@ -58,8 +58,11 @@ class PermissionAskerActivity : Activity()
                     intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK
                     applicationContext.startActivity(intent)
 
-                    ActivityResultEventBus.post(OnPermissionsDeniedEvent())
-                    finish()
+                    //race condition
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        ActivityResultEventBus.post(OnPermissionsDeniedEvent())
+                        finish()
+                    }, 50)
                 }
                 else
                 {
@@ -68,14 +71,20 @@ class PermissionAskerActivity : Activity()
             }
             else
             {
-                ActivityResultEventBus.post(OnPermissionsGrantedEvent())
-                finish()
+                //race condition
+                Handler(Looper.getMainLooper()).postDelayed({
+                    ActivityResultEventBus.post(OnPermissionsGrantedEvent())
+                    finish()
+                }, 50)
             }
         }
         else
         {
-            ActivityResultEventBus.post(OnPermissionsGrantedEvent())
-            finish()
+            //race condition
+            Handler(Looper.getMainLooper()).postDelayed({
+                ActivityResultEventBus.post(OnPermissionsGrantedEvent())
+                finish()
+            }, 50)
         }
     }
 
@@ -94,4 +103,6 @@ class PermissionAskerActivity : Activity()
             finish()
         }
     }
+
+    override fun onBackPressed() {}
 }

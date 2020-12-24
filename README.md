@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:1.1.4'
+    implementation 'ro.andob.activityresult:eventbus:1.1.5'
 }
 ```
 
@@ -137,7 +137,7 @@ class MainActivity2 extends BaseActivity2
 
 ### Permission asker
 
-From version 1.1.4 and on, you can use this library to ask for permissions:
+From version 1.1.5 on, you can use this library to ask for permissions:
 
 ```kotlin
 PermissionAskerActivity.ask(it.context, android.Manifest.permission.CAMERA)
