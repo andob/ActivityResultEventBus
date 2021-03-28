@@ -46,7 +46,7 @@ ActivityResultEventBus.post(OnCatChoosedEvent(cat), delay = 100) //100ms
 - Receive events in the ``MainActivity`` context:
 
 ```kotlin
-startActivity(Intent(this, CatListActivity::class.java))
+startActivity(Intent(context, CatListActivity::class.java))
 OnActivityResult<OnCatChoosedEvent> { event ->
     catLabel.text=event.cat.name
 }
