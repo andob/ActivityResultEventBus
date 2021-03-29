@@ -427,4 +427,14 @@ ActivityResultEventBus disadvantages:
 
 ### LATER EDIT: AndroidX ActivityResult API
 
-TODO
+The new AndroidX ActivityResult API takes a step further in reducing the boilerplate, however I think it has serious API design problems. Why?
+
+- You have to call ``registerForActivityResult`` with the event listener lambda, in ``onCreate``, long before the need
+- Thus you can't take advantage of closures, as describe above closures are very useful at writing complex navigation logic, without the need of extra irrelevant class fields. Closures makes navigation declarative, and the most readable way to write code is the declarative way.
+- You still have to work with Intents, deserialize and serialize. It's boilerplate and not typesafe.
+- It promotes saving the ``launcher`` objects as fields in the activity class. Something we must avoid at all costs is adding more fields to our activity classes, since they already are massive God objects, since they inherit huge amount of methods and fields.
+- While one may argue that promoting composition of lambdas / closures will lead to callback hell, I strongly believe that callback hell is way more manageable than having an activity class with tons of fields.
+
+### What about the new AndroidX Navigation Component?
+
+Well, that looks really nice. It has a typesafe mechanism to pass arguments, by generating classes that helps with bundle serialization / deserialization, similar to libraries like BundleArgs. Never used it, so if you have a greenfield project, please use Single-Activity application architecture, Fragments and Navigation Component.
