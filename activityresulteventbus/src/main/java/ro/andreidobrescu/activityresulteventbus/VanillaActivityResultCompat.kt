@@ -34,10 +34,10 @@ class VanillaActivityResultCompat : Activity()
         private const val INTENT_KEY_INTENT_RESULT_MAPPERS = "RESULT_MAPPERS"
         private const val INTENT_REQUEST_CODE = 1234
 
-        fun <EVENT> createCompatibilityLayer() = Builder<EVENT>()
+        fun createCompatibilityLayer() = Builder()
     }
 
-    class Builder<EVENT>
+    class Builder
     {
         private var intentFactory : SerializableMapper<Context, Intent>? = null
         fun setIntentFactory(factory : SerializableMapper<Context, Intent>) = also { intentFactory=factory }
@@ -48,8 +48,8 @@ class VanillaActivityResultCompat : Activity()
         private var onIntentActivityStopped : SerializableProcedure? = null
         fun setOnIntentActivityStopped(listener : SerializableProcedure) = also { onIntentActivityStopped=listener }
 
-        private val resultMappers : HashMap<Int, SerializableMapper<Intent?, EVENT?>> = HashMap()
-        fun addResultMapper(resultCode : Int, mapper : SerializableMapper<Intent?, EVENT?>) = also { resultMappers[resultCode]=mapper }
+        private val resultMappers : HashMap<Int, SerializableMapper<Intent?, Any?>> = HashMap()
+        fun addResultMapper(resultCode : Int, mapper : SerializableMapper<Intent?, Any?>) = also { resultMappers[resultCode]=mapper }
 
         fun startActivity(context : Context)
         {

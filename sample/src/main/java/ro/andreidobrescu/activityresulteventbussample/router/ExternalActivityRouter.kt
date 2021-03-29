@@ -10,7 +10,7 @@ object ExternalActivityRouter
 {
     fun startChoosePictureFromGalleryActivity(context : Context)
     {
-        VanillaActivityResultCompat.createCompatibilityLayer<OnImageFileChoosedFromGalleryEvent>()
+        VanillaActivityResultCompat.createCompatibilityLayer()
             .setIntentFactory factory@ { wrappedContext : Context ->
                 val intent=Intent(/*wrappedContext, clazz*/)
                 intent.type="image/*"

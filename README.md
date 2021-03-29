@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:1.2.0'
+    implementation 'ro.andob.activityresult:eventbus:1.2.1'
 }
 ```
 
@@ -161,7 +161,7 @@ OnActivityResult<OnPermissionsGrantedEvent> { event ->
 
 ### Vanilla Activity Result Compatibility layer
 
-From version 1.2.0 on, you can use this library to open activities using the vanilla Activity Result mechanism. For instance, to pick an image from gallery or to open camera to take a picture. This is useful since overriding the ``onActivityResult()`` method is deprecated and the new AndroidX ActivityResult API is recommended (but I don't want to use it because of its limitations, read the comparison for more details).
+From version 1.2.1 on, you can use this library to open activities using the vanilla Activity Result mechanism. For instance, to pick an image from gallery or to open camera to take a picture. This is useful since overriding the ``onActivityResult()`` method is deprecated and the new AndroidX ActivityResult API is recommended (but I don't want to use it because of its limitations, read the comparison for more details).
  
 Example usage:
 
@@ -177,7 +177,7 @@ object ExternalActivityRouter
 {
     fun startChoosePictureFromGalleryActivity(context : Context)
     {
-        VanillaActivityResultCompat.createCompatibilityLayer<OnImageFileChoosedFromGalleryEvent>()
+        VanillaActivityResultCompat.createCompatibilityLayer()
             .setIntentFactory factory@ { wrappedContext : Context ->
                 val intent=Intent(/*wrappedContext, clazz*/)
                 intent.type="image/*"
