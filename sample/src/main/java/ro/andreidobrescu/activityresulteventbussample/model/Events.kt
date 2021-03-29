@@ -4,3 +4,8 @@ class OnCatChoosedEvent
 (
     val cat : Cat
 )
+
+class OnImageFileChoosedFromGalleryEvent
+(
+    val picturePath : String
+)

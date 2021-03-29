@@ -25,6 +25,9 @@ dependencies {
     //appcompat
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
+    //picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
     //library
     implementation project(':activityresulteventbus')
 }

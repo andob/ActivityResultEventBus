@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:1.1.8'
+    implementation 'ro.andob.activityresult:eventbus:1.1.9'
 }
 ```
 
@@ -146,11 +146,7 @@ binding.chooseSomethingButton.setOnClickListener={ v ->
 }
 ```
 
-With AndroidX ActivityResult, you would be forced to register the listener in onCreate, leading to more boilerplate code. Otherwise you would get a
-
-```kotlin
-IllegalStateException: LifecycleOwner is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.
-```
+With AndroidX ActivityResult, you would be forced to register the listener in onCreate, leading to more boilerplate code. Otherwise you would get a ``IllegalStateException: LifecycleOwner is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.`` error.
 
 ### Permission asker
 
@@ -163,10 +159,68 @@ OnActivityResult<OnPermissionsGrantedEvent> { event ->
 }
 ```
 
+### Vanilla Activity Result Compatibility layer
+
+From version 1.1.9 on, you can use this library to open activities using the vanilla Activity Result mechanism. For instance, to pick an image from gallery or to open camera to take a picture. This is useful since overriding the ``onActivityResult()`` method is deprecated and the new AndroidX ActivityResult API is recommended. But we don't want to use that because of its limitations. For instance:
+
+```kotlin
+class OnImageFileChoosedFromGalleryEvent
+(
+    val picturePath : String
+)
+```
+
+```kotlin
+object ExternalActivityRouter
+{
+    fun startChoosePictureFromGalleryActivity(context : Context)
+    {
+        VanillaActivityResultCompat.createCompatibilityLayer<OnImageFileChoosedFromGalleryEvent>()
+            .setIntentFactory factory@ { wrappedContext : Context ->
+                /*please use wrappedContext, not context here, for instance new Intent(wrappedContext, clazz)*/
+                val intent=Intent()
+                intent.type="image/*"
+                intent.action=Intent.ACTION_GET_CONTENT
+                return@factory intent
+            }
+            .setResultMapper mapper@ { activityResult ->
+                if (activityResult.resultCode==Activity.RESULT_OK)
+                {
+                    activityResult.data?.data?.toString()?.let { imageUrl ->
+                        val imagePath=imageUrl.replace("file://", "")
+                        return@mapper OnImageFileChoosedFromGalleryEvent(imagePath)
+                    }
+                }
+
+                return@mapper null
+            }
+            .startActivity(context)
+    }
+}
+```
+
+```kotlin
+choosePictureButton.setOnClickListener {
+    PermissionAskerActivity.ask(it.context, android.Manifest.permission.CAMERA)
+    OnActivityResult<OnPermissionsGrantedEvent> { grantedEvent ->
+        ExternalActivityRouter.startChoosePictureFromGalleryActivity(it.context)
+        OnActivityResult<OnImageFileChoosedFromGalleryEvent> { event ->
+            Picasso.get().load(event.picturePath).into(imageView)
+        }
+    }
+}
+```
+
+Compatibility layer method reference:
+- setIntentFactory (required) - you must pass a mapper that transforms a context with the intent that will be used to start the activity.
+- setResultMapper (required) - you must pass a mapper that transforms an ActivityResult object (containing resultCode : int and data : Intent) into an event object
+- onIntentActivityStarted (optional) - event listener that will be called before starting the activity
+- onIntentActivityStopped (optional) - event listener that will be called after the user returns from the activity
+
 ### License
 
 ```java
-Copyright 2019-2020 Andrei Dobrescu
+Copyright 2019-2021 Andrei Dobrescu
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

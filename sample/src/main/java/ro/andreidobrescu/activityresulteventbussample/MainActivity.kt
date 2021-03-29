@@ -1,10 +1,15 @@
 package ro.andreidobrescu.activityresulteventbussample
 
 import android.os.Bundle
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
-import ro.andreidobrescu.activityresulteventbus.OnActivityResult
+import com.squareup.picasso.Picasso
+import ro.andreidobrescu.activityresulteventbus.*
 import ro.andreidobrescu.activityresulteventbussample.model.OnCatChoosedEvent
+import ro.andreidobrescu.activityresulteventbussample.model.OnImageFileChoosedFromGalleryEvent
 import ro.andreidobrescu.activityresulteventbussample.router.ActivityRouter
+import ro.andreidobrescu.activityresulteventbussample.router.ExternalActivityRouter
 
 class MainActivity : BaseActivity()
 {
@@ -13,12 +18,24 @@ class MainActivity : BaseActivity()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val catLabel=findViewById<TextView>(R.id.catLabel)!!
+        val chooseCatButton=findViewById<TextView>(R.id.chooseCatButton)!!
+        val choosePictureButton=findViewById<Button>(R.id.choosePictureButton)!!
+        val imageView=findViewById<ImageView>(R.id.imageView)!!
 
-        catLabel.setOnClickListener {
+        chooseCatButton.setOnClickListener {
             ActivityRouter.startCatListActivity(from = this)
             OnActivityResult<OnCatChoosedEvent> { event ->
-                catLabel.text=event.cat.name
+                chooseCatButton.text=event.cat.name
+            }
+        }
+
+        choosePictureButton.setOnClickListener {
+            PermissionAskerActivity.ask(it.context, android.Manifest.permission.CAMERA)
+            OnActivityResult<OnPermissionsGrantedEvent> { grantedEvent ->
+                ExternalActivityRouter.startChoosePictureFromGalleryActivity(it.context)
+                OnActivityResult<OnImageFileChoosedFromGalleryEvent> { event ->
+                    Picasso.get().load(event.picturePath).into(imageView)
+                }
             }
         }
     }
