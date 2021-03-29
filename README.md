@@ -133,7 +133,24 @@ class MainActivity2 extends BaseActivity2
 ```
 
 
-### [Vanilla onActivityResult vs GreenRobot EventBus vs ActivityResultEventBus comparison](https://github.com/andob/ActivityResultEventBus/blob/master/COMPARISON.md)
+### [Vanilla onActivityResult vs GreenRobot EventBus vs AndroidX ActivityResult vs ActivityResultEventBus comparison](https://github.com/andob/ActivityResultEventBus/blob/master/COMPARISON.md)
+
+### Yes, you can call OnActivityResult<EVENT> { event -> } anywhere you want!
+
+Unlike AndroidX's Activity Result library, you can register to receive events even after onCreate. For instance,
+
+```kotlin
+binding.chooseSomethingButton.setOnClickListener={ v ->
+    startActivity(new Intent(context, SomethingChooserActivity.class));
+    OnActivityResult<OnSomethingChoosedEvent> { event -> }
+}
+```
+
+With AndroidX ActivityResult, you would be forced to register the listener in onCreate, leading to more boilerplate code. Otherwise you would get a
+
+```kotlin
+IllegalStateException: LifecycleOwner is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.
+```
 
 ### Permission asker
 

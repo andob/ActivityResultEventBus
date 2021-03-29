@@ -424,3 +424,7 @@ ActivityResultEventBus disadvantages:
 
 1. ActivityResultEventBus should be used only as an onActivityResult replacement. On any other use cases (for instance, sending a ``UpdateBackgroundColorEvent`` to all background activities), please use a general-purpose event bus, such as GreenRobot EventBus.
 2. Composing code blocks and lambdas can lead to "callback hell". Still, this is completely manageable by organising methods: not having a gigantic method, but splitting it into smaller methods. For instance, in the last example, the code is splitted into three methods: ``onCreate``, ``onScanRestaurantQRCodeButtonClicked`` and ``onAddReviewButtonClicked``, instead of keeping all the code inside ``onCreate``
+
+### LATER EDIT: AndroidX ActivityResult API
+
+TODO
