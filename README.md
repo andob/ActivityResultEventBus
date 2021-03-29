@@ -161,7 +161,9 @@ OnActivityResult<OnPermissionsGrantedEvent> { event ->
 
 ### Vanilla Activity Result Compatibility layer
 
-From version 1.1.9 on, you can use this library to open activities using the vanilla Activity Result mechanism. For instance, to pick an image from gallery or to open camera to take a picture. This is useful since overriding the ``onActivityResult()`` method is deprecated and the new AndroidX ActivityResult API is recommended. But we don't want to use that because of its limitations. For instance:
+From version 1.1.9 on, you can use this library to open activities using the vanilla Activity Result mechanism. For instance, to pick an image from gallery or to open camera to take a picture. This is useful since overriding the ``onActivityResult()`` method is deprecated and the new AndroidX ActivityResult API is recommended (but I don't want to use it because of its limitations, read the comparison for more details).
+ 
+Example usage:
 
 ```kotlin
 class OnImageFileChoosedFromGalleryEvent
