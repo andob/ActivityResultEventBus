@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:1.1.9'
+    implementation 'ro.andob.activityresult:eventbus:1.2.0'
 }
 ```
 
@@ -161,7 +161,7 @@ OnActivityResult<OnPermissionsGrantedEvent> { event ->
 
 ### Vanilla Activity Result Compatibility layer
 
-From version 1.1.9 on, you can use this library to open activities using the vanilla Activity Result mechanism. For instance, to pick an image from gallery or to open camera to take a picture. This is useful since overriding the ``onActivityResult()`` method is deprecated and the new AndroidX ActivityResult API is recommended (but I don't want to use it because of its limitations, read the comparison for more details).
+From version 1.2.0 on, you can use this library to open activities using the vanilla Activity Result mechanism. For instance, to pick an image from gallery or to open camera to take a picture. This is useful since overriding the ``onActivityResult()`` method is deprecated and the new AndroidX ActivityResult API is recommended (but I don't want to use it because of its limitations, read the comparison for more details).
  
 Example usage:
 
@@ -179,22 +179,15 @@ object ExternalActivityRouter
     {
         VanillaActivityResultCompat.createCompatibilityLayer<OnImageFileChoosedFromGalleryEvent>()
             .setIntentFactory factory@ { wrappedContext : Context ->
-                /*please use wrappedContext, not context here, for instance new Intent(wrappedContext, clazz)*/
-                val intent=Intent()
+                val intent=Intent(/*wrappedContext, clazz*/)
                 intent.type="image/*"
                 intent.action=Intent.ACTION_GET_CONTENT
                 return@factory intent
             }
-            .setResultMapper mapper@ { activityResult ->
-                if (activityResult.resultCode==Activity.RESULT_OK)
-                {
-                    activityResult.data?.data?.toString()?.let { imageUrl ->
-                        val imagePath=imageUrl.replace("file://", "")
-                        return@mapper OnImageFileChoosedFromGalleryEvent(imagePath)
-                    }
+            .addResultMapper(Activity.RESULT_OK) { resultIntent ->
+                resultIntent?.data?.toString()?.let { imagePath ->
+                    OnImageFileChoosedFromGalleryEvent(imagePath)
                 }
-
-                return@mapper null
             }
             .startActivity(context)
     }
@@ -214,10 +207,10 @@ choosePictureButton.setOnClickListener {
 ```
 
 Compatibility layer method reference:
-- ``setIntentFactory : (Context) -> (Intent)`` (required) - you must pass a mapper that transforms a context with the intent that will be used to start the activity.
-- ``setResultMapper : (ActivityResult) -> (EVENT)`` (required) - you must pass a mapper that transforms an ActivityResult object (containing resultCode : int and data : Intent) into an event object that will be sent via the event bus, or a null.
-- ``onIntentActivityStarted`` (optional) - event listener that will be called before starting the activity
-- ``onIntentActivityStopped`` (optional) - event listener that will be called after the user returns from the activity
+- ``fun setIntentFactory(factory : (Context) -> (Intent))`` - REQUIRED - you must pass a mapper that transforms a context into the intent that will be used to start the activity.
+- ``fun addResultMapper(resultCode : Int, mapper : (Intent?) -> (EVENT?))`` - AT LEAST ONE REQUIRED - you must pass at least one mapper that transforms a nullable result intent into an event object or null for a specific resultCode use case.
+- ``fun setOnIntentActivityStarted(listener : () -> (Unit))`` (optional) - event listener that will be called before starting the activity
+- ``fun setOnIntentActivityStopped(listener : () -> (Unit))`` (optional) - event listener that will be called after the user returns from the activity
 
 ### License
 

@@ -12,22 +12,15 @@ object ExternalActivityRouter
     {
         VanillaActivityResultCompat.createCompatibilityLayer<OnImageFileChoosedFromGalleryEvent>()
             .setIntentFactory factory@ { wrappedContext : Context ->
-                /*please use wrappedContext, not context here, for instance new Intent(wrappedContext, clazz)*/
-                val intent=Intent()
+                val intent=Intent(/*wrappedContext, clazz*/)
                 intent.type="image/*"
                 intent.action=Intent.ACTION_GET_CONTENT
                 return@factory intent
             }
-            .setResultMapper mapper@ { activityResult ->
-                if (activityResult.resultCode==Activity.RESULT_OK)
-                {
-                    activityResult.data?.data?.toString()?.let { imageUrl ->
-                        val imagePath=imageUrl.replace("file://", "")
-                        return@mapper OnImageFileChoosedFromGalleryEvent(imagePath)
-                    }
+            .addResultMapper(Activity.RESULT_OK) { resultIntent ->
+                resultIntent?.data?.toString()?.let { imagePath ->
+                    OnImageFileChoosedFromGalleryEvent(imagePath)
                 }
-
-                return@mapper null
             }
             .startActivity(context)
     }
