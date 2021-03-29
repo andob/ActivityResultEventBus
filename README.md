@@ -214,10 +214,10 @@ choosePictureButton.setOnClickListener {
 ```
 
 Compatibility layer method reference:
-- setIntentFactory (required) - you must pass a mapper that transforms a context with the intent that will be used to start the activity.
-- setResultMapper (required) - you must pass a mapper that transforms an ActivityResult object (containing resultCode : int and data : Intent) into an event object
-- onIntentActivityStarted (optional) - event listener that will be called before starting the activity
-- onIntentActivityStopped (optional) - event listener that will be called after the user returns from the activity
+- ``setIntentFactory : (Context) -> (Intent)`` (required) - you must pass a mapper that transforms a context with the intent that will be used to start the activity.
+- ``setResultMapper : (ActivityResult) -> (EVENT)`` (required) - you must pass a mapper that transforms an ActivityResult object (containing resultCode : int and data : Intent) into an event object that will be sent via the event bus, or a null.
+- ``onIntentActivityStarted`` (optional) - event listener that will be called before starting the activity
+- ``onIntentActivityStopped`` (optional) - event listener that will be called after the user returns from the activity
 
 ### License
 
