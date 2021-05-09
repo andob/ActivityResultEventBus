@@ -8,6 +8,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import java.util.*
 
+@Suppress("UNCHECKED_CAST")
 object ActivityResultEventBus
 {
     private class ActivityData
@@ -16,17 +17,11 @@ object ActivityResultEventBus
     )
     {
         var isActivityInForeground = false
-        val actionsToDoAfterActivityComesToForeground : Queue<() -> (Unit)> = LinkedList()
-        val eventListeners = mutableListOf<TypedEventListener<Any>>()
-    }
 
-    private class TypedEventListener<EVENT>
-    (
-        val type : Class<EVENT>,
-        val listener : (EVENT) -> (Unit)
-    ) : (EVENT) -> (Unit)
-    {
-        override fun invoke(event : EVENT) = listener.invoke(event)
+        private val eventListeners = mutableMapOf<Class<Any>, (Any) -> (Unit)>()
+        fun <EVENT> eventListeners() = eventListeners as MutableMap<Class<EVENT>, (EVENT) -> (Unit)>
+
+        val actionsToDoAfterActivityComesToForeground : Queue<() -> (Unit)> = LinkedList()
     }
 
     private val data = mutableListOf<ActivityData>()
@@ -38,7 +33,7 @@ object ActivityResultEventBus
         val eventClass=event::class.java
         for (activityData in data)
         {
-            activityData.eventListeners.find { it.type==eventClass }?.let { eventListener ->
+            activityData.eventListeners<EVENT>()[eventClass]?.let { eventListener ->
                 scheduleEventListener(eventListener, activityData, event, delay)
             }
         }
@@ -46,7 +41,7 @@ object ActivityResultEventBus
 
     private fun <EVENT : Any> scheduleEventListener
     (
-        eventListener : TypedEventListener<Any>,
+        eventListener : (EVENT) -> (Unit),
         activityData : ActivityData,
         event : EVENT, delay : Long = 0L
     )
@@ -59,8 +54,8 @@ object ActivityResultEventBus
         }
         else
         {
-            activityData.eventListeners.remove(eventListener)
             activityData.activity.runOnUiThread {
+                activityData.eventListeners<EVENT>().remove(event::class.java)
                 invokeEventListener(eventListener, event, delay)
             }
         }
@@ -68,7 +63,7 @@ object ActivityResultEventBus
 
     private fun <EVENT : Any> invokeEventListener
     (
-        eventListener : TypedEventListener<Any>,
+        eventListener : (EVENT) -> (Unit),
         event : EVENT, delay : Long
     )
     {
@@ -118,7 +113,6 @@ object ActivityResultEventBus
             data.remove(activityData)
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
     {
         val activityData=findOrCreateActivityData(activity)
@@ -130,9 +124,7 @@ object ActivityResultEventBus
         }
         else
         {
-            activityData.eventListeners.add(
-                TypedEventListener(type = eventType, listener = eventListener)
-                    as TypedEventListener<Any>)
+            activityData.eventListeners<EVENT>()[eventType]=eventListener
         }
     }
 
