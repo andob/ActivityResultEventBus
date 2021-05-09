@@ -17,7 +17,7 @@ object ActivityResultEventBus
     {
         var isActivityInForeground = false
         val actionsToDoAfterActivityComesToForeground : Queue<() -> (Unit)> = LinkedList()
-        var eventListeners = mutableListOf<TypedEventListener<Any>>()
+        val eventListeners = mutableListOf<TypedEventListener<Any>>()
     }
 
     private class TypedEventListener<EVENT>
@@ -38,38 +38,49 @@ object ActivityResultEventBus
         val eventClass=event::class.java
         for (activityData in data)
         {
-            activityData.eventListeners
-                .find { it.type==eventClass }
-                ?.let { eventListener ->
-                    postOnEventListener(eventListener, activityData, event, delay)
-                }
+            activityData.eventListeners.find { it.type==eventClass }?.let { eventListener ->
+                scheduleEventListener(eventListener, activityData, event, delay)
+            }
         }
     }
 
-    private fun <EVENT : Any> postOnEventListener(eventListener : TypedEventListener<Any>,
-                                                  activityData : ActivityData,
-                                                  event : EVENT, delay : Long = 0L)
+    private fun <EVENT : Any> scheduleEventListener
+    (
+        eventListener : TypedEventListener<Any>,
+        activityData : ActivityData,
+        event : EVENT, delay : Long = 0L
+    )
     {
         if (!activityData.isActivityInForeground)
         {
             activityData.actionsToDoAfterActivityComesToForeground.add {
-                postOnEventListener(eventListener, activityData, event, delay)
+                scheduleEventListener(eventListener, activityData, event, delay)
             }
         }
         else
         {
+            activityData.eventListeners.remove(eventListener)
             activityData.activity.runOnUiThread {
-                if (delay>0)
-                {
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        eventListener.invoke(event)
-                    }, delay)
-                }
-                else
-                {
-                    eventListener.invoke(event)
-                }
+                invokeEventListener(eventListener, event, delay)
             }
+        }
+    }
+
+    private fun <EVENT : Any> invokeEventListener
+    (
+        eventListener : TypedEventListener<Any>,
+        event : EVENT, delay : Long
+    )
+    {
+        if (delay>0)
+        {
+            Handler(Looper.getMainLooper()).postDelayed({
+                eventListener.invoke(event)
+            }, delay)
+        }
+        else
+        {
+            eventListener.invoke(event)
         }
     }
 
@@ -89,9 +100,6 @@ object ActivityResultEventBus
     {
         val activityData=findOrCreateActivityData(activity)
         activityData.isActivityInForeground=true
-
-        if (activityData.eventListeners.isNotEmpty())
-            activityData.eventListeners=mutableListOf()
 
         while(activityData.actionsToDoAfterActivityComesToForeground.isNotEmpty())
             activityData.actionsToDoAfterActivityComesToForeground.remove().invoke()
