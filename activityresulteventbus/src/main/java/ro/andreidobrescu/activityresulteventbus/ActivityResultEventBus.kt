@@ -24,10 +24,13 @@ object ActivityResultEventBus
         val actionsToDoAfterActivityComesToForeground : Queue<() -> (Unit)> = LinkedList()
     }
 
+    @JvmStatic
     private val data = mutableListOf<ActivityData>()
 
+    @JvmStatic
     fun <EVENT : Any> post(event : EVENT) = post(event, delay = 0L)
 
+    @JvmStatic
     fun <EVENT : Any> post(event : EVENT, delay : Long)
     {
         val eventClass=event::class.java
@@ -39,6 +42,7 @@ object ActivityResultEventBus
         }
     }
 
+    @JvmStatic
     private fun <EVENT : Any> scheduleEventListener
     (
         eventListener : (EVENT) -> (Unit),
@@ -61,6 +65,7 @@ object ActivityResultEventBus
         }
     }
 
+    @JvmStatic
     private fun <EVENT : Any> invokeEventListener
     (
         eventListener : (EVENT) -> (Unit),
@@ -79,6 +84,7 @@ object ActivityResultEventBus
         }
     }
 
+    @JvmStatic
     private fun findOrCreateActivityData(activity : Activity) : ActivityData
     {
         var activityData=data.find { it.activity==activity }
@@ -91,6 +97,7 @@ object ActivityResultEventBus
         return activityData
     }
 
+    @JvmStatic
     fun onActivityPostResumed(activity : Activity)
     {
         val activityData=findOrCreateActivityData(activity)
@@ -100,12 +107,14 @@ object ActivityResultEventBus
             activityData.actionsToDoAfterActivityComesToForeground.remove().invoke()
     }
 
+    @JvmStatic
     fun onActivityPaused(activity : Activity)
     {
         val activityData=findOrCreateActivityData(activity)
         activityData.isActivityInForeground=false
     }
 
+    @JvmStatic
     fun onActivityDestroyed(activity : Activity)
     {
         val activityData=data.find { it.activity==activity }
@@ -113,6 +122,7 @@ object ActivityResultEventBus
             data.remove(activityData)
     }
 
+    @JvmStatic
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : (EVENT) -> (Unit))
     {
         val activityData=findOrCreateActivityData(activity)
@@ -128,6 +138,7 @@ object ActivityResultEventBus
         }
     }
 
+    @JvmStatic
     fun <EVENT> registerActivityEventListener(activity : Activity, eventType : Class<EVENT>, eventListener : JActivityResultEventListener<EVENT>)
     {
         registerActivityEventListener(activity = activity, eventType = eventType,

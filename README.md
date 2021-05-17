@@ -11,7 +11,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:1.2.3'
+    implementation 'ro.andob.activityresult:eventbus:1.2.4'
 }
 ```
 
@@ -84,7 +84,7 @@ abstract class BaseActivity : AppCompatActivity()
 ### Example usage in Java
 
 ```java
-ActivityResultEventBus.INSTANCE.post(new OnCatChoosedEvent(cat));
+ActivityResultEventBus.post(new OnCatChoosedEvent(cat));
 ```
 
 ```java
@@ -94,26 +94,26 @@ class BaseActivity2 extends AppCompatActivity
     protected void onPostResume()
     {
         super.onPostResume();
-        ActivityResultEventBus.INSTANCE.onActivityPostResumed(this);
+        ActivityResultEventBus.onActivityPostResumed(this);
     }
 
     @Override
     protected void onPause()
     {
-        ActivityResultEventBus.INSTANCE.onActivityPaused(this);
+        ActivityResultEventBus.onActivityPaused(this);
         super.onPause();
     }
 
     @Override
     protected void onDestroy()
     {
-        ActivityResultEventBus.INSTANCE.onActivityDestroyed(this);
+        ActivityResultEventBus.onActivityDestroyed(this);
         super.onDestroy();
     }
 
     public <EVENT> void onActivityResult(Class<EVENT> eventType, JActivityResultEventListener<EVENT> eventListener)
     {
-        ActivityResultEventBus.INSTANCE.registerActivityEventListener(this, eventType, eventListener);
+        ActivityResultEventBus.registerActivityEventListener(this, eventType, eventListener);
     }
 }
 ```
