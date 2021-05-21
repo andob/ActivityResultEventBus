@@ -1,6 +1,6 @@
 ## ActivityResultEventBus
 
-Tiny simple EventBus to handle activity result-like behaviors
+Tiny simple EventBus with activity result-like behaviour
 
 ```
 allprojects {
@@ -48,7 +48,7 @@ ActivityResultEventBus.post(OnCatChoosedEvent(cat), delay = 100) //100ms
 ```kotlin
 startActivity(Intent(context, CatListActivity::class.java))
 OnActivityResult<OnCatChoosedEvent> { event ->
-    catLabel.text=event.cat.name
+    catLabel.text = event.cat.name
 }
 ```
 
@@ -140,13 +140,13 @@ class MainActivity2 extends BaseActivity2
 Unlike AndroidX's Activity Result library, you can register to receive events even after onCreate. For instance,
 
 ```kotlin
-binding.chooseSomethingButton.setOnClickListener={ v ->
+binding.chooseSomethingButton.setOnClickListener { v ->
     startActivity(new Intent(context, SomethingChooserActivity.class));
     OnActivityResult<OnSomethingChoosedEvent> { event -> }
 }
 ```
 
-With AndroidX ActivityResult, you would be forced to register the listener in onCreate, leading to more boilerplate code. Otherwise you would get a ``IllegalStateException: LifecycleOwner is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.`` error.
+With AndroidX ActivityResult, you would be forced to register the listener in onCreate. Otherwise you would get a ``IllegalStateException: LifecycleOwner is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.`` error.
 
 ### Permission asker
 
@@ -158,59 +158,6 @@ OnActivityResult<OnPermissionsGrantedEvent> { event ->
     //take picture
 }
 ```
-
-### Vanilla Activity Result Compatibility layer
-
-From version 1.2.1 on, you can use this library to open activities using the vanilla Activity Result mechanism. For instance, to pick an image from gallery or to open camera to take a picture. This is useful since overriding the ``onActivityResult()`` method is deprecated and the new AndroidX ActivityResult API is recommended (but I don't want to use it because of its limitations, read the comparison for more details).
- 
-Example usage:
-
-```kotlin
-class OnImageFileChoosedFromGalleryEvent
-(
-    val picturePath : String
-)
-```
-
-```kotlin
-object ExternalActivityRouter
-{
-    fun startChoosePictureFromGalleryActivity(context : Context)
-    {
-        VanillaActivityResultCompat.createCompatibilityLayer()
-            .setIntentFactory factory@ { wrappedContext : Context ->
-                val intent=Intent(/*wrappedContext, clazz*/)
-                intent.type="image/*"
-                intent.action=Intent.ACTION_GET_CONTENT
-                return@factory intent
-            }
-            .addResultMapper(Activity.RESULT_OK) { resultIntent ->
-                resultIntent?.data?.toString()?.let { imagePath ->
-                    OnImageFileChoosedFromGalleryEvent(imagePath)
-                }
-            }
-            .startActivity(context)
-    }
-}
-```
-
-```kotlin
-choosePictureButton.setOnClickListener {
-    PermissionAskerActivity.ask(it.context, android.Manifest.permission.CAMERA)
-    OnActivityResult<OnPermissionsGrantedEvent> { grantedEvent ->
-        ExternalActivityRouter.startChoosePictureFromGalleryActivity(it.context)
-        OnActivityResult<OnImageFileChoosedFromGalleryEvent> { event ->
-            Picasso.get().load(event.picturePath).into(imageView)
-        }
-    }
-}
-```
-
-Compatibility layer method reference:
-- ``fun setIntentFactory(factory : (Context) -> (Intent))`` - REQUIRED - you must pass a mapper that transforms a context into the intent that will be used to start the activity.
-- ``fun addResultMapper(resultCode : Int, mapper : (Intent?) -> (EVENT?))`` - AT LEAST ONE REQUIRED - you must pass at least one mapper that transforms a nullable result intent into an event object or null for a specific resultCode use case.
-- ``fun setOnIntentActivityStarted(listener : () -> (Unit))`` (optional) - event listener that will be called before starting the activity
-- ``fun setOnIntentActivityStopped(listener : () -> (Unit))`` (optional) - event listener that will be called after the user returns from the activity
 
 ### License
 

@@ -14,7 +14,7 @@ class CatChooserActivity : AppCompatActivity
     fun showCat(cat : Cat)
     {
         catButton.setOnClickListener {
-            val resultIntent=Intent()
+            val resultIntent = Intent()
             resultIntent.putExtra("cat", cat)
             setResult(RESULT_OK, resultIntent)
             finish()
@@ -157,7 +157,7 @@ class MainActivity : BaseActivity()
         setContentView(R.layout.activity_main)
 
         scanRestaurantQRCodeButton.setOnClickListener {
-            Intent(this, QRCodeScannerActivity::class.java)
+            startActivity(Intent(this, QRCodeScannerActivity::class.java))
         }
     }
 
@@ -228,7 +228,7 @@ class MainActivity : BaseActivity()
                     ReviewDialog.ReviewOption(description = "$rating stars", rating = rating)
                 },
                 onReviewOptionSelected = { reviewOption ->
-                    Intent(this, QRCodeScannerActivity::class.java)
+                    startActivity(Intent(this, QRCodeScannerActivity::class.java))
                     shouldAssignRatingOnQRCodeScanned = true
                     ratingToAssignOnQrCodeScanned = reviewOption.rating
                 })
@@ -296,8 +296,8 @@ class MainActivity : BaseActivity()
                     ReviewDialog.ReviewOption(description = "$rating stars", rating = rating)
                 },
                 onReviewOptionSelected = { reviewOption ->
-                    Intent(this, QRCodeScannerActivity::class.java)
-                    onRestaurantQrCodeScanned={ restaurantId ->
+                    startActivity(Intent(this, QRCodeScannerActivity::class.java))
+                    onRestaurantQrCodeScanned = { restaurantId ->
                         //todo presenter.assignRating(restaurantId = restaurantId, 
                         //rating = reviewOption.rating)
                     }
@@ -429,7 +429,7 @@ ActivityResultEventBus disadvantages:
 
 The new AndroidX ActivityResult API takes a step further in reducing the boilerplate, however I think it has serious API design problems. Why?
 
-- You have to call ``registerForActivityResult`` with the event listener lambda, in ``onCreate``, long before the need
+- You have to call ``registerForActivityResult`` with the event listener lambda, in ``onCreate``, long before the need to start the intent and await the result.
 - Thus you can't take advantage of closures, as describe above closures are very useful at writing complex navigation logic, without the need of extra irrelevant class fields. Closures makes navigation declarative, and the most readable way to write code is the declarative way.
 - You still have to work with Intents, deserialize and serialize. It's boilerplate and not typesafe.
 - It promotes saving the ``launcher`` objects as fields in the activity class. Something we must avoid at all costs is adding more fields to our activity classes, since they already are massive God objects, since they inherit huge amount of methods and fields.
