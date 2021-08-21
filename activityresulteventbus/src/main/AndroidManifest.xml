@@ -8,13 +8,15 @@
             android:name=".PermissionAskerActivity"
             android:configChanges="${configChanges}"
             android:windowSoftInputMode="stateHidden"
-            android:theme="@style/TransparentDialogTheme"/>
+            android:theme="@style/TransparentDialogTheme"
+            android:exported="false"/>
 
         <activity
             android:name=".VanillaActivityResultCompat"
             android:configChanges="${configChanges}"
             android:windowSoftInputMode="stateHidden"
-            android:theme="@style/TransparentDialogTheme"/>
+            android:theme="@style/TransparentDialogTheme"
+            android:exported="false"/>
 
     </application>
 
