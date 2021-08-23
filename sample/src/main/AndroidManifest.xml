@@ -3,6 +3,8 @@
           xmlns:tools="http://schemas.android.com/tools" package="ro.andreidobrescu.activityresulteventbussample">
 
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
             android:allowBackup="false"

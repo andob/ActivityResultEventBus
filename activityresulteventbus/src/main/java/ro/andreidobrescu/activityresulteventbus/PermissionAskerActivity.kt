@@ -1,5 +1,6 @@
 package ro.andreidobrescu.activityresulteventbus
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -23,11 +24,30 @@ class PermissionAskerActivity : Activity()
     {
         private const val INTENT_KEY_PERMISSIONS = "permissions"
 
+        @JvmStatic
         fun ask(context : Context, vararg permissions : String)
         {
             val intent=Intent(context, PermissionAskerActivity::class.java)
             intent.putExtra(INTENT_KEY_PERMISSIONS, permissions)
             context.startActivity(intent)
+        }
+
+        @JvmStatic
+        fun arePermissionsAccepted(context : Context, vararg permissions : String) : Boolean
+        {
+            if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.S)
+            {
+                if (permissions.contains(Manifest.permission.ACCESS_FINE_LOCATION))
+                {
+                    return permissions.toSet().minus(Manifest.permission.ACCESS_FINE_LOCATION).all { permission ->
+                        ContextCompat.checkSelfPermission(context, permission)==PackageManager.PERMISSION_GRANTED
+                    }
+                }
+            }
+
+            return permissions.all { permission ->
+                ContextCompat.checkSelfPermission(context, permission)==PackageManager.PERMISSION_GRANTED
+            }
         }
     }
 
@@ -44,7 +64,7 @@ class PermissionAskerActivity : Activity()
     {
         if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M)
         {
-            if (permissions.any { permission -> ContextCompat.checkSelfPermission(this, permission)!=PackageManager.PERMISSION_GRANTED })
+            if (!arePermissionsAccepted(context = this, permissions = permissions))
             {
                 if (permissions.any { permission -> ActivityCompat.shouldShowRequestPermissionRationale(this, permission) })
                 {
@@ -81,14 +101,14 @@ class PermissionAskerActivity : Activity()
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (grantResults.any { it!=PackageManager.PERMISSION_GRANTED })
+        if (arePermissionsAccepted(context = this, permissions = permissions))
         {
-            ActivityResultEventBus.post(OnPermissionsDeniedEvent())
+            ActivityResultEventBus.post(OnPermissionsGrantedEvent())
             finish()
         }
         else
         {
-            ActivityResultEventBus.post(OnPermissionsGrantedEvent())
+            ActivityResultEventBus.post(OnPermissionsDeniedEvent())
             finish()
         }
     }

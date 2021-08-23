@@ -1,5 +1,6 @@
 package ro.andreidobrescu.activityresulteventbussample
 
+import android.Manifest
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -30,7 +31,8 @@ class MainActivity : BaseActivity()
         }
 
         choosePictureButton.setOnClickListener {
-            PermissionAskerActivity.ask(it.context, android.Manifest.permission.CAMERA)
+            PermissionAskerActivity.ask(it.context, Manifest.permission.CAMERA,
+                Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
             OnActivityResult<OnPermissionsGrantedEvent> { grantedEvent ->
                 ExternalActivityRouter.startChoosePictureFromGalleryActivity(it.context)
                 OnActivityResult<OnImageFileChoosedFromGalleryEvent> { event ->
