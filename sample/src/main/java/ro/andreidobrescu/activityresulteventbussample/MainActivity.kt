@@ -6,7 +6,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Picasso
-import ro.andreidobrescu.activityresulteventbus.*
+import ro.andreidobrescu.activityresulteventbus.PermissionAsker
 import ro.andreidobrescu.activityresulteventbussample.model.OnCatChoosedEvent
 import ro.andreidobrescu.activityresulteventbussample.model.OnImageFileChoosedFromGalleryEvent
 import ro.andreidobrescu.activityresulteventbussample.router.ActivityRouter
@@ -25,17 +25,15 @@ class MainActivity : BaseActivity()
 
         chooseCatButton.setOnClickListener {
             ActivityRouter.startCatListActivity(from = this)
-            OnActivityResult<OnCatChoosedEvent> { event ->
+            onActivityResult<OnCatChoosedEvent> { event ->
                 chooseCatButton.text=event.cat.name
             }
         }
 
         choosePictureButton.setOnClickListener {
-            PermissionAskerActivity.ask(it.context, Manifest.permission.CAMERA,
-                Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-            OnActivityResult<OnPermissionsGrantedEvent> { grantedEvent ->
+            PermissionAsker.ask(it.context, Manifest.permission.CAMERA).onGranted {
                 ExternalActivityRouter.startChoosePictureFromGalleryActivity(it.context)
-                OnActivityResult<OnImageFileChoosedFromGalleryEvent> { event ->
+                onActivityResult<OnImageFileChoosedFromGalleryEvent> { event ->
                     Picasso.get().load(event.picturePath).into(imageView)
                 }
             }
