@@ -16,11 +16,11 @@ import androidx.core.content.ContextCompat
 class PermissionAsker
 private constructor()
 {
-    private var onGranted : (() -> Unit)? = null
-    fun onGranted(value : () -> Unit) = also { onGranted=value }
+    private var onGranted : FunctionalInterfaces.Procedure? = null
+    fun onGranted(value : FunctionalInterfaces.Procedure) = also { onGranted=value }
 
-    private var onDenied : (() -> Unit)? = null
-    fun onDenied(value : () -> Unit) = also { onDenied=value }
+    private var onDenied : FunctionalInterfaces.Procedure? = null
+    fun onDenied(value : FunctionalInterfaces.Procedure) = also { onDenied=value }
 
     companion object
     {

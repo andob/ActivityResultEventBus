@@ -32,7 +32,7 @@ object ActivityResultEventBus
         val eventClass=event::class.java
         for (activity in registeredActivities)
         {
-            activity.eventListeners<EVENT>()[eventClass]?.let { eventListener ->
+            activity.getAREBEventListeners<EVENT>()[eventClass]?.let { eventListener ->
                 activity.actionsToDoAfterOnActivityResult.add {
                     Handler(Looper.getMainLooper()).postDelayed({
                         eventListener.invoke(event)
@@ -46,28 +46,22 @@ object ActivityResultEventBus
     fun createCompatibilityLayer() = ExternalActivityCompatibilityLayer()
 }
 
-//Java compatibility layer for Kotlin's (EVENT) -> (Unit)
-interface JActivityResultEventListener<EVENT>
-{
-    fun notify(event : EVENT)
-}
-
-inline fun <reified EVENT> Fragment.onActivityResult(noinline eventListener : (EVENT) -> (Unit))
+inline fun <reified EVENT> Fragment.onActivityResult(eventListener : FunctionalInterfaces.Consumer<EVENT>)
 {
     onActivityResult(context = context!!, eventType = EVENT::class.java, eventListener = eventListener)
 }
 
-inline fun <reified EVENT> View.onActivityResult(noinline eventListener : (EVENT) -> (Unit))
+inline fun <reified EVENT> View.onActivityResult(eventListener : FunctionalInterfaces.Consumer<EVENT>)
 {
     onActivityResult(context = context, eventType = EVENT::class.java, eventListener = eventListener)
 }
 
-inline fun <reified EVENT> onActivityResult(context : Context, noinline eventListener : (EVENT) -> Unit)
+inline fun <reified EVENT> onActivityResult(context : Context, eventListener : FunctionalInterfaces.Consumer<EVENT>)
 {
     onActivityResult(context = context, eventType = EVENT::class.java, eventListener = eventListener)
 }
 
-fun <EVENT> onActivityResult(context : Context, eventType : Class<EVENT>, eventListener : (EVENT) -> Unit)
+fun <EVENT> onActivityResult(context : Context, eventType : Class<EVENT>, eventListener : FunctionalInterfaces.Consumer<EVENT>)
 {
     val activity=AppCompatActivityWithActivityResultEventBus.findFrom(context)
     activity.onActivityResult(eventType = eventType, eventListener = eventListener)

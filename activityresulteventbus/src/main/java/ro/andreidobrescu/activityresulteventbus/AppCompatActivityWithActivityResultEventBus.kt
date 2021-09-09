@@ -11,12 +11,12 @@ import java.util.*
 @Suppress("UNCHECKED_CAST")
 abstract class AppCompatActivityWithActivityResultEventBus : AppCompatActivity()
 {
-    private val rawEventListeners = mutableMapOf<Class<Any>, (Any) -> Unit>()
-    internal fun <EVENT> eventListeners() = rawEventListeners as MutableMap<Class<EVENT>, (EVENT) -> Unit>
+    private val rawAREBEventListeners = mutableMapOf<Class<Any>, FunctionalInterfaces.Consumer<Any>>()
+    fun <EVENT> getAREBEventListeners() = rawAREBEventListeners as MutableMap<Class<EVENT>, FunctionalInterfaces.Consumer<EVENT>>
 
-    internal val actionsToParseOnActivityResult : Queue<(ActivityResult) -> Unit> = LinkedList()
-    internal val actionsToDoAfterOnActivityResult : Queue<() -> Unit> = LinkedList()
-    internal val actionsToDoOnRequestPermissionsResult : Queue<() -> Unit> = LinkedList()
+    internal val actionsToParseOnActivityResult : Queue<FunctionalInterfaces.Consumer<ActivityResult>> = LinkedList()
+    internal val actionsToDoAfterOnActivityResult : Queue<FunctionalInterfaces.Procedure> = LinkedList()
+    internal val actionsToDoOnRequestPermissionsResult : Queue<FunctionalInterfaces.Procedure> = LinkedList()
 
     private val activityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
@@ -42,19 +42,14 @@ abstract class AppCompatActivityWithActivityResultEventBus : AppCompatActivity()
             activityLauncher.launch(intent)
     }
 
-    inline fun <reified EVENT> onActivityResult(noinline eventListener : (EVENT) -> Unit)
+    inline fun <reified EVENT> onActivityResult(eventListener : FunctionalInterfaces.Consumer<EVENT>)
     {
-        onActivityResult(eventType = EVENT::class.java, eventListener = eventListener)
+        onActivityResult(EVENT::class.java, eventListener)
     }
 
-    fun <EVENT> onActivityResult(eventType : Class<EVENT>, eventListener : JActivityResultEventListener<EVENT>)
+    fun <EVENT> onActivityResult(eventType : Class<EVENT>, eventListener : FunctionalInterfaces.Consumer<EVENT>)
     {
-        onActivityResult(eventType = eventType, eventListener = { event -> eventListener.notify(event) })
-    }
-
-    fun <EVENT> onActivityResult(eventType : Class<EVENT>, eventListener : (EVENT) -> Unit)
-    {
-        eventListeners<EVENT>()[eventType]=eventListener
+        getAREBEventListeners<EVENT>()[eventType]=eventListener
     }
 
     override fun onRequestPermissionsResult(requestCode : Int, permissions : Array<out String>, grantResults : IntArray)
@@ -74,7 +69,7 @@ abstract class AppCompatActivityWithActivityResultEventBus : AppCompatActivity()
     override fun onDestroy()
     {
         ActivityResultEventBus.onActivityDestroyed(activity = this)
-        rawEventListeners.clear()
+        rawAREBEventListeners.clear()
         actionsToParseOnActivityResult.clear()
         actionsToDoAfterOnActivityResult.clear()
         actionsToDoOnRequestPermissionsResult.clear()

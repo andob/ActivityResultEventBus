@@ -5,8 +5,8 @@ import android.content.Intent
 
 class ExternalActivityCompatibilityLayer
 {
-    private val resultMappers = mutableMapOf<Int, (Intent?) -> Any?>()
-    fun addResultMapper(resultCode : Int, mapper : (Intent?) -> Any?) = also { resultMappers[resultCode]=mapper }
+    private val resultMappers = mutableMapOf<Int, FunctionalInterfaces.Mapper<Intent?, Any?>>()
+    fun addResultMapper(resultCode : Int, mapper : FunctionalInterfaces.Mapper<Intent?, Any?>) = also { resultMappers[resultCode]=mapper }
 
     fun startActivity(context : Context?, intent : Intent?)
     {
