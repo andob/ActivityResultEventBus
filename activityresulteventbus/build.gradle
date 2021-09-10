@@ -44,7 +44,7 @@ project.afterEvaluate {
             maven(MavenPublication) {
                 groupId 'ro.andob.activityresult'
                 artifactId 'eventbus'
-                version '2.0.1'
+                version '2.0.2'
                 artifact(bundleReleaseAar)
             }
         }

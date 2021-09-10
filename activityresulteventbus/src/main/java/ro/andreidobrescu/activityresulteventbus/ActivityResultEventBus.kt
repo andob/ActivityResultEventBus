@@ -30,14 +30,19 @@ object ActivityResultEventBus
     fun <EVENT : Any> post(event : EVENT, delay : Long)
     {
         val eventClass=event::class.java
-        for (activity in registeredActivities)
+
+        val topMostActivity=registeredActivities.lastOrNull { activity ->
+            activity.getAREBEventListeners<EVENT>()[eventClass]!=null
+        }
+
+        if (topMostActivity!=null)
         {
-            activity.getAREBEventListeners<EVENT>()[eventClass]?.let { eventListener ->
-                activity.actionsToDoAfterOnActivityResult.add {
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        eventListener.invoke(event)
-                    }, delay)
-                }
+            val eventListener=topMostActivity.getAREBEventListeners<EVENT>()[eventClass]!!
+
+            topMostActivity.actionsToDoAfterOnActivityResult.add {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    eventListener.invoke(event)
+                }, delay)
             }
         }
     }
