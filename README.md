@@ -1,4 +1,4 @@
-## ActivityResultEventBus
+## ActivityResultEventBus V2
 
 Tiny simple EventBus with activity result-like behaviour
 
@@ -9,9 +9,10 @@ allprojects {
     }
 }
 ```
+
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:1.2.7'
+    implementation 'ro.andob.activityresult:eventbus:2.0.2'
 }
 ```
 
@@ -19,7 +20,7 @@ dependencies {
 
 You have two activities, ``MainActivity`` and ``CatListActivity``. ``MainActivity`` must open ``CatListActivity`` and receive the cat choosed by the user from the list:
 
-- Define the event:
+- Define the event class:
 
 ```kotlin
 class OnCatChoosedEvent
@@ -37,125 +38,147 @@ catButton.setOnClickListener {
 }
 ```
 
-You can also post an event after a delay:
-
-```kotlin
-ActivityResultEventBus.post(OnCatChoosedEvent(cat), delay = 100) //100ms
-```
-
 - Receive events in the ``MainActivity`` context:
 
 ```kotlin
 startActivity(Intent(context, CatListActivity::class.java))
-OnActivityResult<OnCatChoosedEvent> { event ->
+onActivityResult<OnCatChoosedEvent> { event ->
     catLabel.text = event.cat.name
 }
 ```
 
-``OnActivityResult`` is an extension function available for ``Activity``, ``Fragment`` and ``View`` classes.
-
 All events will be received on UI thread.
 
-- Register the EventBus in ``BaseActivity``:
+- Let all your activities extend ``AppCompatActivityWithActivityResultEventBus``:
 
 ```kotlin
-abstract class BaseActivity : AppCompatActivity()
-{
-    override fun onPostResume()
-    {
-        super.onPostResume()
-        ActivityResultEventBus.onActivityPostResumed(this)
-    }
-    
-    override fun onPause()
-    {
-        super.onPause()
-        ActivityResultEventBus.onActivityPaused(this)
-    }
+abstract class BaseActivity : AppCompatActivityWithActivityResultEventBus()
+```
 
-    override fun onDestroy()
-    {
-        ActivityResultEventBus.onActivityDestroyed(this)
-        super.onDestroy()
-    }
+- You can also receive events anywhere else you want, fragments, views etc, just pass activity context as an argument:
+
+```kotlin
+import ro.andreidobrescu.activityresulteventbus.onActivityResult
+
+context.startActivity(Intent(context, CatListActivity::class.java))
+onActivityResult<OnCatChoosedEvent>(context) { event ->
+    catLabel.text = event.cat.name
 }
 ```
 
-### Example usage in Java
+### Versioning
+
+Version 2 of this library is based upon AndroidX ActivityResult API. It is recommended to migrate from version 1 to 2.
+
+Version 1 had a custom mechanism, based on lifecycle callbacks. You can find the legacy documentation of V1 [here](https://github.com/andob/ActivityResultEventBus/blob/master/README_OLD.md).
+
+### Java compatibility
+
+All APIs available in this library are fully compatible with both Java and Kotlin. Example usage in Java:
+
+- posting events:
 
 ```java
-ActivityResultEventBus.post(new OnCatChoosedEvent(cat));
-```
-
-```java
-class BaseActivity2 extends AppCompatActivity
+catButton.setOnClickListener(v ->
 {
-    @Override
-    protected void onPostResume()
-    {
-        super.onPostResume();
-        ActivityResultEventBus.onActivityPostResumed(this);
-    }
-
-    @Override
-    protected void onPause()
-    {
-        ActivityResultEventBus.onActivityPaused(this);
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        ActivityResultEventBus.onActivityDestroyed(this);
-        super.onDestroy();
-    }
-
-    public <EVENT> void onActivityResult(Class<EVENT> eventType, JActivityResultEventListener<EVENT> eventListener)
-    {
-        ActivityResultEventBus.registerActivityEventListener(this, eventType, eventListener);
-    }
-}
+    ActivityResultEventBus.post(new OnCatChoosedEvent(cat));
+    finish();
+});
 ```
+
+- receiving events in an activity:
 
 ```java
-class MainActivity2 extends BaseActivity2
-{
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-
-        startActivity(new Intent(this, CatListActivity.class));
-        onActivityResult(OnCatChoosedEvent.class, event -> System.out.println(event.getCat()));
-    }
-}
+startActivity(new Intent(getContext(), CatListActivity.class));
+onActivityResult(OnCatChoosedEvent.class, event ->
+    catLabel.text = event.cat.name);
 ```
 
+- receiving events in a fragment / view / other object:
+
+```java
+import static ro.andreidobrescu.activityresulteventbus.onActivityResult;
+
+getContext().startActivity(new Intent(getContext(), CatListActivity.class));
+onActivityResult(getContext(), OnCatChoosedEvent.class, event ->
+    catLabel.text = event.cat.name);
+```
 
 ### [Vanilla onActivityResult vs GreenRobot EventBus vs AndroidX ActivityResult vs ActivityResultEventBus comparison](https://github.com/andob/ActivityResultEventBus/blob/master/COMPARISON.md)
 
-### Yes, you can call OnActivityResult<EVENT> { event -> } anywhere you want!
+### Yes, you can call onActivityResult<EVENT> { event -> } anywhere you want!
 
 Unlike AndroidX's Activity Result library, you can register to receive events even after onCreate. For instance,
 
 ```kotlin
 binding.chooseSomethingButton.setOnClickListener { v ->
     startActivity(new Intent(context, SomethingChooserActivity.class));
-    OnActivityResult<OnSomethingChoosedEvent> { event -> }
+    onActivityResult<OnSomethingChoosedEvent> { event -> }
 }
 ```
 
 With AndroidX ActivityResult, you would be forced to register the listener in onCreate. Otherwise you would get a ``IllegalStateException: LifecycleOwner is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.`` error.
 
+This is highly useful in defining complex navigation flow logic, as describe in the above comparison.
+
 ### Permission asker
 
-From version 1.1.8 on, you can use this library to ask for permissions:
+You can also use this library to ask runtime permissions. While ``arePermissionsAccepted`` method will return a boolean, ``ask`` method will return a pseudo-future, to which you can optionally bind ``onGranted`` and / or ``onDenied`` callbacks.
 
 ```kotlin
-PermissionAskerActivity.ask(it.context, android.Manifest.permission.CAMERA)
-OnActivityResult<OnPermissionsGrantedEvent> { event ->
-    //take picture
+if (!PermissionAsker.arePermissionsAccepted(context = this, arrayOf(Manifest.permission.CAMERA)))
+{
+    PermissionAsker.ask(context = this, arrayOf(Manifest.permission.CAMERA))
+        .onGranted { doSomething() }
+        .onDenied { doSomething() }
+}
+```
+
+### Vanilla requestCode / resultCode / data compatibility layer
+
+Usually you will start activities from within your project / process. However, there are times when you must start and get result from activities from outside of your app. There is a compatibility layer for this:
+
+- define your events
+
+```kotlin
+class OnPictureNotChoosedFromGalleryEvent
+class OnPictureChoosedFromGalleryEvent(val filePath : String)
+```
+
+- use the compatibility layer, start the intent with it and map possible resultCodes and result data intents:
+
+```kotlin
+object ExternalActivityRouter
+{
+    fun startChoosePictureFromGalleryActivity(context : Context)
+    {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        
+        ActivityResultEventBus.createCompatibilityLayer()
+            .addResultMapper(Activity.RESULT_CANCEL) { resultIntent ->
+                OnPictureNotChoosedFromGalleryEvent()
+            }
+            .addResultMapper(Activity.RESULT_OK) { resultIntent ->
+                resultIntent?.data?.toString()?.replace("file://", "")?.let { imageFilePath ->
+                    OnPictureChoosedFromGalleryEvent(imageFilePath)
+                }
+            }
+            .startActivity(context, intent)
+    }
+}
+```
+
+```kotlin
+class PictureChooserView : CustomView
+{
+    private fun onChoosePictureButtonClicked()
+    {
+        ExternalActivityRouter.startChoosePictureFromGalleryActivity(context)
+                onActivityResult<OnPictureNotChoosedFromGalleryEvent>(context) { }
+        onActivityResult<OnPictureChoosedFromGalleryEvent>(context) { filePath -> addImage(filePath) }
+    }
 }
 ```
 
@@ -175,3 +198,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.`
+
+```
+

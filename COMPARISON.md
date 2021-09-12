@@ -1,6 +1,8 @@
 ## Vanilla onActivityResult vs GreenRobot EventBus vs ActivityResultEventBus comparison
 
-In this page I will try to explain why you should use ActivityResultEventBus instead of onActivityResult or GreenRobot's EventBus for passing results from one activity to another.
+In this page I will try to explain why you should use ActivityResultEventBus instead of onActivityResult or GreenRobot's EventBus for passing results from one activity to another. 
+
+EDIT: This library and article was written some time ago, before AndroidX ActivityResult API became a thing. You can find notes about ActivityResultEventBus vs ActivityResult API at the end of this page. Although ActivityResult API is a step forward from the vanilla onActivityResult method, the ActivityResultEventBus is more suitable on defining complex UI navigation flow logic, as described below. Starting with version 2.\*.\*, ActivityResultEventBus is based on AndroidX ActivityResult API, extending it to fix such complex navigation needs.
 
 ### The vanilla way - onActivityResult
 
@@ -425,7 +427,7 @@ ActivityResultEventBus disadvantages:
 1. ActivityResultEventBus should be used only as an onActivityResult replacement. On any other use cases (for instance, sending a ``UpdateBackgroundColorEvent`` to all background activities), please use a general-purpose event bus, such as GreenRobot EventBus.
 2. Composing code blocks and lambdas can lead to "callback hell". Still, this is completely manageable by organising methods: not having a gigantic method, but splitting it into smaller methods. For instance, in the last example, the code is splitted into three methods: ``onCreate``, ``onScanRestaurantQRCodeButtonClicked`` and ``onAddReviewButtonClicked``, instead of keeping all the code inside ``onCreate``
 
-### LATER EDIT: AndroidX ActivityResult API
+### EDIT: AndroidX ActivityResult API
 
 The new AndroidX ActivityResult API takes a step further in reducing the boilerplate, however I think it has serious API design problems. Why?
 
@@ -435,6 +437,6 @@ The new AndroidX ActivityResult API takes a step further in reducing the boilerp
 - It promotes saving the ``launcher`` objects as fields in the activity class. Something we must avoid at all costs is adding more fields to our activity classes, since they already are massive God objects, since they inherit huge amount of methods and fields.
 - While one may argue that promoting composition of lambdas / closures will lead to callback hell, I strongly believe that callback hell is way more manageable than having an activity class with tons of fields.
 
-### What about the new AndroidX Navigation Component?
+### EDIT: What about the new AndroidX Navigation Component?
 
 Well, that looks really nice. It has a typesafe mechanism to pass arguments, by generating classes that helps with bundle serialization / deserialization, similar to libraries like BundleArgs. Never used it, so if you have a greenfield project, please use Single-Activity application architecture, Fragments and Navigation Component.
