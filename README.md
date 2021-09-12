@@ -55,7 +55,7 @@ All events will be received on UI thread.
 abstract class BaseActivity : AppCompatActivityWithActivityResultEventBus()
 ```
 
-- You can also receive events anywhere else you want, fragments, views etc, just pass activity context as an argument:
+- You can also receive events anywhere else you want, fragments, views, other objects:
 
 ```kotlin
 import ro.andreidobrescu.activityresulteventbus.onActivityResult
@@ -76,7 +76,7 @@ Version 1 had a custom mechanism, based on lifecycle callbacks. You can find the
 
 All APIs available in this library are fully compatible with both Java and Kotlin. Example usage in Java:
 
-- posting events:
+- Posting events:
 
 ```java
 catButton.setOnClickListener(v ->
@@ -86,40 +86,29 @@ catButton.setOnClickListener(v ->
 });
 ```
 
-- receiving events in an activity:
+- Receiving events in an activity:
 
 ```java
 startActivity(new Intent(getContext(), CatListActivity.class));
-onActivityResult(OnCatChoosedEvent.class, event ->
-    catLabel.text = event.cat.name);
+onActivityResult(OnCatChoosedEvent.class, event -> catLabel.text = event.cat.name);
 ```
 
-- receiving events in a fragment / view / other object:
+- Receiving events in a fragment / view / other object:
 
 ```java
 import static ro.andreidobrescu.activityresulteventbus.onActivityResult;
 
 getContext().startActivity(new Intent(getContext(), CatListActivity.class));
-onActivityResult(getContext(), OnCatChoosedEvent.class, event ->
-    catLabel.text = event.cat.name);
+onActivityResult(getContext(), OnCatChoosedEvent.class, event -> catLabel.text = event.cat.name);
 ```
 
 ### [Vanilla onActivityResult vs GreenRobot EventBus vs AndroidX ActivityResult vs ActivityResultEventBus comparison](https://github.com/andob/ActivityResultEventBus/blob/master/COMPARISON.md)
 
 ### Yes, you can call onActivityResult<EVENT> { event -> } anywhere you want!
 
-Unlike AndroidX's Activity Result library, you can register to receive events even after onCreate. For instance,
-
-```kotlin
-binding.chooseSomethingButton.setOnClickListener { v ->
-    startActivity(new Intent(context, SomethingChooserActivity.class));
-    onActivityResult<OnSomethingChoosedEvent> { event -> }
-}
-```
+Unlike AndroidX's Activity Result library, you can register to receive events even after onCreate. This is highly useful in defining complex navigation flow logic, as describe in the above comparison.
 
 With AndroidX ActivityResult, you would be forced to register the listener in onCreate. Otherwise you would get a ``IllegalStateException: LifecycleOwner is attempting to register while current state is RESUMED. LifecycleOwners must call register before they are STARTED.`` error.
-
-This is highly useful in defining complex navigation flow logic, as describe in the above comparison.
 
 ### Permission asker
 
@@ -136,16 +125,16 @@ if (!PermissionAsker.arePermissionsAccepted(context = this, arrayOf(Manifest.per
 
 ### Vanilla requestCode / resultCode / data compatibility layer
 
-Usually you will start activities from within your project / process. However, there are times when you must start and get result from activities from outside of your app. There is a compatibility layer for this:
+Usually you will start activities from within your project / process. However, there are times when you must start and get result from activities from outside of your app. There is a compatibility layer for this. For instance:
 
-- define your events
+- Define your events
 
 ```kotlin
 class OnPictureNotChoosedFromGalleryEvent
 class OnPictureChoosedFromGalleryEvent(val filePath : String)
 ```
 
-- use the compatibility layer, start the intent with it and map possible resultCodes and result data intents:
+- Use the compatibility layer, start the intent with it and map possible resultCodes and result data intents:
 
 ```kotlin
 object ExternalActivityRouter
@@ -176,7 +165,7 @@ class PictureChooserView : CustomView
     private fun onChoosePictureButtonClicked()
     {
         ExternalActivityRouter.startChoosePictureFromGalleryActivity(context)
-                onActivityResult<OnPictureNotChoosedFromGalleryEvent>(context) { }
+        onActivityResult<OnPictureNotChoosedFromGalleryEvent>(context) { }
         onActivityResult<OnPictureChoosedFromGalleryEvent>(context) { filePath -> addImage(filePath) }
     }
 }
@@ -184,7 +173,7 @@ class PictureChooserView : CustomView
 
 ### License
 
-```java
+```
 Copyright 2019-2021 Andrei Dobrescu
 
 Licensed under the Apache License, Version 2.0 (the "License");
