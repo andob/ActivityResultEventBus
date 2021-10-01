@@ -148,7 +148,7 @@ class RestaurantDetailsActivity : BaseActivity()
 }
 ```
 
-Note: here I am using the [BundleArgs](https://github.com/MFlisar/BundleArgs) library. This library generates intent / bundle serialization / deserialization code, thus replacing the weakly typed intent / bundle key-value stores with nice compile-time checked Builders. I highly recommend it to pass input arguments to activities / fragments, instead of using the vanilla way.
+Note: here I am using the [BundleArgs](https://github.com/andob/BundleArgs) library. This library generates intent / bundle serialization / deserialization code, thus replacing the weakly typed intent / bundle key-value stores with nice compile-time checked Builders. I highly recommend it to pass input arguments to activities / fragments, instead of using the vanilla way.
 
 ```kotlin
 class MainActivity : BaseActivity()
