@@ -20,6 +20,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    publishing {
+        singleVariant("release") {}
+    }
 }
 
 dependencies {
@@ -41,11 +44,11 @@ project.afterEvaluate {
                 }
             }
 
-            maven(MavenPublication) {
+            release(MavenPublication) {
+                from components.release
                 groupId 'ro.andob.activityresult'
                 artifactId 'eventbus'
                 version '2.0.2'
-                artifact(bundleReleaseAar)
             }
         }
     }
