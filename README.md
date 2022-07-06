@@ -12,7 +12,7 @@ allprojects {
 
 ```
 dependencies {
-    implementation 'ro.andob.activityresult:eventbus:2.0.2'
+    implementation 'ro.andob.activityresult:eventbus:2.0.3'
 }
 ```
 
