@@ -8,6 +8,10 @@ class ExternalActivityCompatibilityLayer
     private val resultMappers = mutableMapOf<Int, FunctionalInterfaces.Mapper<Intent?, Any?>>()
     fun addResultMapper(resultCode : Int, mapper : FunctionalInterfaces.Mapper<Intent?, Any?>) = also { resultMappers[resultCode]=mapper }
 
+    fun addResultMapper(resultCode : Int, consumer : FunctionalInterfaces.Consumer<Intent?>) = also {
+        resultMappers[resultCode]=FunctionalInterfaces.Mapper<Intent?, Any?> { consumer(it); null }
+    }
+
     fun startActivity(context : Context?, intent : Intent?)
     {
         if (intent==null) throw RuntimeException("Please pass intent!!!")
