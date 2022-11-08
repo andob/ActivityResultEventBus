@@ -23,6 +23,7 @@ android {
     publishing {
         singleVariant("release") {}
     }
+    namespace 'ro.andreidobrescu.activityresulteventbus'
 }
 
 dependencies {
@@ -30,7 +31,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     //appcompat
-    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
 }
 
 project.afterEvaluate {
@@ -48,7 +49,7 @@ project.afterEvaluate {
                 from components.release
                 groupId 'ro.andob.activityresult'
                 artifactId 'eventbus'
-                version '2.0.4'
+                version '2.0.5'
             }
         }
     }
