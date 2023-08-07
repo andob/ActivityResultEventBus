@@ -8,7 +8,7 @@ object ActivityRouter
 {
     fun startCatListActivity(from : Context)
     {
-        val i=Intent(from, CatListActivity::class.java)
+        val i = Intent(from, CatListActivity::class.java)
         from.startActivity(i)
     }
 }

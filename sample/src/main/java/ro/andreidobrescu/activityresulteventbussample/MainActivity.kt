@@ -14,19 +14,19 @@ import ro.andreidobrescu.activityresulteventbussample.router.ExternalActivityRou
 
 class MainActivity : BaseActivity()
 {
-    override fun onCreate(savedInstanceState: Bundle?)
+    override fun onCreate(savedInstanceState : Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val chooseCatButton=findViewById<TextView>(R.id.chooseCatButton)!!
-        val choosePictureButton=findViewById<Button>(R.id.choosePictureButton)!!
-        val imageView=findViewById<ImageView>(R.id.imageView)!!
+        val chooseCatButton = findViewById<TextView>(R.id.chooseCatButton)!!
+        val choosePictureButton = findViewById<Button>(R.id.choosePictureButton)!!
+        val imageView = findViewById<ImageView>(R.id.imageView)!!
 
         chooseCatButton.setOnClickListener {
             ActivityRouter.startCatListActivity(from = this)
             onActivityResult<OnCatChoosedEvent> { event ->
-                chooseCatButton.text=event.cat.name
+                chooseCatButton.text = event.cat.name
             }
         }
 

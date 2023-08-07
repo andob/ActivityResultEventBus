@@ -8,15 +8,15 @@ import ro.andreidobrescu.activityresulteventbussample.model.OnCatChoosedEvent
 
 class CatListActivity : BaseActivity()
 {
-    override fun onCreate(savedInstanceState: Bundle?)
+    override fun onCreate(savedInstanceState : Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cat_list)
 
-        val catButton=findViewById<Button>(R.id.catButton)!!
+        val catButton = findViewById<Button>(R.id.catButton)!!
 
-        val cat=Cat()
-        catButton.text=cat.name
+        val cat = Cat()
+        catButton.text = cat.name
 
         catButton.setOnClickListener {
             ActivityResultEventBus.post(OnCatChoosedEvent(cat))

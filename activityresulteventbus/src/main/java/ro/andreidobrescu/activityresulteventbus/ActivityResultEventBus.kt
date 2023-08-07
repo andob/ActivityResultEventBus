@@ -29,15 +29,15 @@ object ActivityResultEventBus
     @JvmStatic
     fun <EVENT : Any> post(event : EVENT, delay : Long)
     {
-        val eventClass=event::class.java
+        val eventClass = event::class.java
 
-        val topMostActivity=registeredActivities.lastOrNull { activity ->
+        val topMostActivity = registeredActivities.lastOrNull { activity ->
             activity.getAREBEventListeners<EVENT>()[eventClass]!=null
         }
 
         if (topMostActivity!=null)
         {
-            val eventListener=topMostActivity.getAREBEventListeners<EVENT>()[eventClass]!!
+            val eventListener = topMostActivity.getAREBEventListeners<EVENT>()[eventClass]!!
 
             topMostActivity.actionsToDoAfterOnActivityResult.add {
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -68,6 +68,6 @@ inline fun <reified EVENT> onActivityResult(context : Context, eventListener : F
 
 fun <EVENT> onActivityResult(context : Context, eventType : Class<EVENT>, eventListener : FunctionalInterfaces.Consumer<EVENT>)
 {
-    val activity=AppCompatActivityWithActivityResultEventBus.findFrom(context)
+    val activity = AppCompatActivityWithActivityResultEventBus.findFrom(context)
     activity.onActivityResult(eventType = eventType, eventListener = eventListener)
 }

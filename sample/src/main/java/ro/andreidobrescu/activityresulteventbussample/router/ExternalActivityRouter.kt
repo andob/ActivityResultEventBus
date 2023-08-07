@@ -10,9 +10,9 @@ object ExternalActivityRouter
 {
     fun startChoosePictureFromGalleryActivity(context : Context)
     {
-        val intent=Intent()
-        intent.type="image/*"
-        intent.action=Intent.ACTION_GET_CONTENT
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
 
         ActivityResultEventBus.createCompatibilityLayer()
             .addResultMapper(Activity.RESULT_OK) { resultIntent ->

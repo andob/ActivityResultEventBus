@@ -17,10 +17,10 @@ class PermissionAsker
 private constructor()
 {
     private var onGranted : FunctionalInterfaces.Procedure? = null
-    fun onGranted(value : FunctionalInterfaces.Procedure) = also { onGranted=value }
+    fun onGranted(value : FunctionalInterfaces.Procedure) = also { onGranted = value }
 
     private var onDenied : FunctionalInterfaces.Procedure? = null
-    fun onDenied(value : FunctionalInterfaces.Procedure) = also { onDenied=value }
+    fun onDenied(value : FunctionalInterfaces.Procedure) = also { onDenied = value }
 
     companion object
     {
@@ -45,8 +45,8 @@ private constructor()
         @JvmStatic
         fun ask(context : Context, vararg permissions : String) : PermissionAsker
         {
-            val activity=AppCompatActivityWithActivityResultEventBus.findFrom(context)
-            val permissionAsker=PermissionAsker()
+            val activity = AppCompatActivityWithActivityResultEventBus.findFrom(context)
+            val permissionAsker = PermissionAsker()
 
             Handler(Looper.getMainLooper()).post {
 
@@ -64,10 +64,10 @@ private constructor()
                     {
                         Toast.makeText(activity, context.getString(R.string.please_accept_permissions), Toast.LENGTH_LONG).show()
 
-                        val intent=Intent()
-                        intent.action=Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                        intent.data=Uri.fromParts("package", context.applicationContext.packageName, null)
-                        intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK
+                        val intent = Intent()
+                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        intent.data = Uri.fromParts("package", context.applicationContext.packageName, null)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         context.startActivity(intent)
 
                         permissionAsker.onDenied?.invoke()

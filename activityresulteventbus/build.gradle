@@ -3,10 +3,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 33
+    namespace 'ro.andreidobrescu.activityresulteventbus'
+    compileSdk 33
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 33
+        minSdk 14
+        targetSdk 33
 
         manifestPlaceholders = [
             configChanges: "mcc|mnc|locale|touchscreen|keyboard|keyboardHidden" +
@@ -20,10 +21,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
     publishing {
         singleVariant("release") {}
     }
-    namespace 'ro.andreidobrescu.activityresulteventbus'
 }
 
 dependencies {
@@ -31,7 +38,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     //appcompat
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
 
 project.afterEvaluate {
