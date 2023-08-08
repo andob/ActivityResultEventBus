@@ -22,6 +22,9 @@ private constructor()
     private var onDenied : FunctionalInterfaces.Procedure? = null
     fun onDenied(value : FunctionalInterfaces.Procedure) = also { onDenied = value }
 
+    private var onAny : FunctionalInterfaces.Procedure? = null
+    fun onAny(value : FunctionalInterfaces.Procedure) = also { onAny = value }
+
     companion object
     {
         @JvmStatic
@@ -53,10 +56,12 @@ private constructor()
                 if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M)
                 {
                     permissionAsker.onGranted?.invoke()
+                    permissionAsker.onAny?.invoke()
                 }
                 else if (arePermissionsAccepted(context = context, permissions = permissions))
                 {
                     permissionAsker.onGranted?.invoke()
+                    permissionAsker.onAny?.invoke()
                 }
                 else
                 {
@@ -71,6 +76,7 @@ private constructor()
                         context.startActivity(intent)
 
                         permissionAsker.onDenied?.invoke()
+                        permissionAsker.onAny?.invoke()
                     }
                     else
                     {
@@ -80,10 +86,12 @@ private constructor()
                             if (arePermissionsAccepted(context = context, permissions = permissions))
                             {
                                 permissionAsker.onGranted?.invoke()
+                                permissionAsker.onAny?.invoke()
                             }
                             else
                             {
                                 permissionAsker.onDenied?.invoke()
+                                permissionAsker.onAny?.invoke()
                             }
                         }
                     }
