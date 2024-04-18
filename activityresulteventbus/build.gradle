@@ -8,12 +8,6 @@ android {
     defaultConfig {
         minSdk 14
         targetSdk 33
-
-        manifestPlaceholders = [
-            configChanges: "mcc|mnc|locale|touchscreen|keyboard|keyboardHidden" +
-                "|navigation|screenLayout|fontScale|uiMode|orientation" +
-                "|density|screenSize|smallestScreenSize"
-        ]
     }
     buildTypes {
         release {
