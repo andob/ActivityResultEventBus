@@ -436,7 +436,3 @@ The new AndroidX ActivityResult API takes a step further in reducing the boilerp
 - You still have to work with Intents, deserialize and serialize. It's boilerplate and not typesafe.
 - It promotes saving the ``launcher`` objects as fields in the activity class. Something we must avoid at all costs is adding more fields to our activity classes, since they already are massive God objects, since they inherit huge amount of methods and fields.
 - While one may argue that promoting composition of lambdas / closures will lead to callback hell, I strongly believe that callback hell is way more manageable than having an activity class with tons of fields.
-
-### EDIT: What about the new AndroidX Navigation Component?
-
-Well, that looks really nice. It has a typesafe mechanism to pass arguments, by generating classes that helps with bundle serialization / deserialization, similar to libraries like BundleArgs. Never used it, so if you have a greenfield project, please use Single-Activity application architecture, Fragments and Navigation Component.
