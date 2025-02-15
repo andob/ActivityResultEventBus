@@ -53,7 +53,7 @@ private constructor()
 
             Handler(Looper.getMainLooper()).post {
 
-                if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M)
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
                 {
                     permissionAsker.onGranted?.invoke()
                     permissionAsker.onAny?.invoke()

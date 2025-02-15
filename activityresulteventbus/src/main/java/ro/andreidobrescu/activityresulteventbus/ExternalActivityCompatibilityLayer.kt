@@ -14,8 +14,8 @@ class ExternalActivityCompatibilityLayer
 
     fun startActivity(context : Context?, intent : Intent?)
     {
-        if (intent==null) throw RuntimeException("Please pass intent!!!")
-        if (context==null) throw RuntimeException("Please pass context!!!")
+        if (intent == null) throw RuntimeException("Please pass intent!!!")
+        if (context == null) throw RuntimeException("Please pass context!!!")
         if (resultMappers.isEmpty()) throw RuntimeException("Please pass resultMappers!!!")
 
         val activity = AppCompatActivityWithActivityResultEventBus.findFrom(context)

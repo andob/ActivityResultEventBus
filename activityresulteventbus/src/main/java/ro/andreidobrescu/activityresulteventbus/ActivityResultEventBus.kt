@@ -35,7 +35,7 @@ object ActivityResultEventBus
             activity.getAREBEventListeners<EVENT>()[eventClass]!=null
         }
 
-        if (topMostActivity!=null)
+        if (topMostActivity != null)
         {
             val eventListener = topMostActivity.getAREBEventListeners<EVENT>()[eventClass]!!
 
