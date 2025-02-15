@@ -1,4 +1,4 @@
-c## ActivityResultEventBus V2
+## ActivityResultEventBus V2
 
 Tiny simple EventBus simulating activity result-like behaviour!
 
