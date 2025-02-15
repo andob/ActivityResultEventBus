@@ -109,6 +109,54 @@ if (!PermissionAsker.arePermissionsAccepted(context = this, arrayOf(Manifest.per
 }
 ```
 
+### Vanilla requestCode / resultCode / data compatibility layer
+
+Usually you will start activities from within your project / process. However, there are times when you must start and get result from activities from outside of your app. There is a compatibility layer for this. For instance:
+
+- Define your events
+
+```kotlin
+class OnPictureNotChoosedFromGalleryEvent
+class OnPictureChoosedFromGalleryEvent(val filePath : String)
+```
+
+- Use the compatibility layer, start the intent with it and map possible resultCodes and result data intents:
+
+```kotlin
+object ExternalActivityRouter
+{
+    fun startChoosePictureFromGalleryActivity(context : Context)
+    {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        
+        ActivityResultEventBus.createCompatibilityLayer()
+            .addResultMapper(Activity.RESULT_CANCEL) { resultIntent ->
+                OnPictureNotChoosedFromGalleryEvent()
+            }
+            .addResultMapper(Activity.RESULT_OK) { resultIntent ->
+                resultIntent?.data?.toString()?.replace("file://", "")?.let { imageFilePath ->
+                    OnPictureChoosedFromGalleryEvent(imageFilePath)
+                }
+            }
+            .startActivity(context, intent)
+    }
+}
+```
+
+```kotlin
+class PictureChooserView : CustomView
+{
+    private fun onChoosePictureButtonClicked()
+    {
+        ExternalActivityRouter.startChoosePictureFromGalleryActivity(context)
+        onActivityResult<OnPictureNotChoosedFromGalleryEvent>(context) { }
+        onActivityResult<OnPictureChoosedFromGalleryEvent>(context) { filePath -> addImage(filePath) }
+    }
+}
+```
+
 ### License
 
 ```
