@@ -3,11 +3,11 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace 'ro.andreidobrescu.activityresulteventbussample'
-    compileSdk 35
+    compileSdk = 36
     defaultConfig {
         applicationId "ro.andreidobrescu.activityresulteventbussample"
-        minSdk 21
-        targetSdk 35
+        minSdk = 21
+        targetSdk = 36
     }
     buildTypes {
         release {
@@ -28,7 +28,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     //appcompat
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
 
     //picasso
     implementation 'com.squareup.picasso:picasso:2.71828'

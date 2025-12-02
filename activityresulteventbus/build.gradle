@@ -4,10 +4,10 @@ apply plugin: 'maven-publish'
 
 android {
     namespace 'ro.andreidobrescu.activityresulteventbus'
-    compileSdk 35
+    compileSdk = 36
     defaultConfig {
-        minSdk 21
-        targetSdk 35
+        minSdk = 21
+        targetSdk = 36
     }
     buildTypes {
         release {
@@ -31,7 +31,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     //appcompat
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
 }
 
 project.afterEvaluate {
@@ -49,7 +49,7 @@ project.afterEvaluate {
                 from components.release
                 groupId 'ro.andob.activityresult'
                 artifactId 'eventbus'
-                version '2.0.7'
+                version '2.0.8'
             }
         }
     }
